@@ -132,6 +132,22 @@
     background: #bdc3c7;
     cursor: not-allowed;
   }
+  .finish-btn {
+    padding: 12px 22px;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .finish-btn:hover { background: #1b2631; }
+  .finish-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+  }
   .action-buttons.secondary {
     margin-top: -10px;
     margin-bottom: 20px;
@@ -346,6 +362,59 @@
   table.grid td.cell {
     position: relative;
   }
+  /* 除法模式: 格子加寬, 內含被除數 + 商/餘 */
+  table.grid td.div-cell {
+    width: 72px;
+    height: 64px;
+    padding: 2px;
+    vertical-align: top;
+  }
+  table.grid .div-dividend {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #2980b9;
+    text-align: center;
+    line-height: 1.1;
+    padding-top: 2px;
+  }
+  table.grid .div-inputs {
+    display: flex;
+    gap: 1px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2px;
+  }
+  table.grid .div-inputs input {
+    width: 48%;
+    height: 26px;
+    border: 1px solid #d5dbdb;
+    border-radius: 3px;
+    text-align: center;
+    font-size: 0.85rem;
+    background: white;
+    padding: 0;
+  }
+  table.grid .div-inputs input::placeholder {
+    color: #bdc3c7;
+    font-size: 0.7rem;
+  }
+  table.grid .div-inputs input:focus {
+    background: #fff9c4;
+    outline: none;
+    border-color: #f39c12;
+  }
+  table.grid .div-inputs input.correct {
+    background: #d5f5e3;
+    color: #27ae60;
+    font-weight: bold;
+    border-color: #a9dfbf;
+  }
+  table.grid .div-inputs input.wrong {
+    background: #fadbd8;
+    color: #e74c3c;
+    font-weight: bold;
+    border-color: #e6b0aa;
+  }
   /* 單一乘法表模式: 格子放大 */
   table.grid.single-mul td {
     width: 52px;
@@ -475,6 +544,7 @@
     <button class="start-btn" id="startBtn">開始挑戰</button>
     <button class="pause-btn" id="pauseBtn" disabled>暫停</button>
     <button class="reset-btn" id="resetBtn" disabled>重新選擇題目</button>
+    <button class="finish-btn" id="finishBtn" disabled>結束挑戰</button>
   </div>
 
   <div class="action-buttons secondary">
@@ -540,6 +610,7 @@
   const startBtn = document.getElementById('startBtn');
   const pauseBtn = document.getElementById('pauseBtn');
   const resetBtn = document.getElementById('resetBtn');
+  const finishBtn = document.getElementById('finishBtn');
   const pauseOverlay = document.getElementById('pauseOverlay');
   const resultEl = document.getElementById('result');
 
@@ -566,9 +637,21 @@
       rowHeaders = shuffle([0,1,2,3,4,5,6,7,8,9]);
       colHeaders = shuffle([0,1,2,3,4,5,6,7,8,9]);
     } else if (mode === 'div') {
+      // 每列一個除數 (1~9 選 10 個可重複), 每列獨立 10 個被除數 (10~99 隨機)
       const divisors = [1,2,3,4,5,6,7,8,9];
       rowHeaders = shuffle(divisors.concat([divisors[Math.floor(Math.random()*9)]]));
-      colHeaders = shuffle([1,2,3,4,5,6,7,8,9,10]); // 商
+      // gridQuestions[i][j] = 該列該欄的被除數
+      gridQuestions = [];
+      for (let i = 0; i < 10; i++) {
+        const rowQ = [];
+        const used = new Set();
+        while (rowQ.length < 10) {
+          const d = 10 + Math.floor(Math.random() * 90); // 10-99
+          if (!used.has(d)) { used.add(d); rowQ.push(d); }
+        }
+        gridQuestions.push(rowQ);
+      }
+      colHeaders = []; // 除法模式沒有共用欄標題
     } else if (mode.startsWith('mul') && mode.length > 3) {
       // 單一乘法表: mul2, mul3, ..., mul9
       // 規則: 12 格橫列, 被乘數 1~12 打亂呈現
@@ -601,7 +684,12 @@
         if (mode === 'add') ans = r + c;
         else if (mode === 'sub') ans = r - c;
         else if (mode === 'mul') ans = r * c;
-        else if (mode === 'div') ans = c; // 被除數 = r*c, 除法答案是商 c
+        else if (mode === 'div') {
+          // 被除數在 gridQuestions[i][j], 除數是 rowHeaders[i]
+          const dividend = gridQuestions[i][j];
+          const divisor = rowHeaders[i];
+          ans = { q: Math.floor(dividend / divisor), r: dividend % divisor };
+        }
         row.push(ans);
       }
       answers.push(row);
@@ -653,7 +741,65 @@
       return;
     }
 
-    // --- 標準 100 格模式 ---
+    // --- 除法模式: 獨立版面 (每列獨立被除數, 每格填商+餘) ---
+    if (mode === 'div') {
+      // 表頭只顯示一個「÷」角標, 沒有共用欄標題
+      const headerRow = document.createElement('tr');
+      const corner = document.createElement('td');
+      corner.className = 'header';
+      corner.textContent = '÷';
+      corner.colSpan = 11;
+      corner.style.textAlign = 'center';
+      headerRow.appendChild(corner);
+      gridEl.appendChild(headerRow);
+
+      for (let i = 0; i < 10; i++) {
+        const tr = document.createElement('tr');
+        const rh = document.createElement('td');
+        rh.className = 'question';
+        rh.textContent = '÷' + rowHeaders[i];
+        tr.appendChild(rh);
+
+        for (let j = 0; j < 10; j++) {
+          const td = document.createElement('td');
+          td.className = 'cell div-cell';
+          // 被除數 (大字)
+          const dividend = document.createElement('div');
+          dividend.className = 'div-dividend';
+          dividend.textContent = gridQuestions[i][j];
+          td.appendChild(dividend);
+          // 兩個 input: 商、餘
+          const inputWrap = document.createElement('div');
+          inputWrap.className = 'div-inputs';
+          const qInput = document.createElement('input');
+          qInput.type = 'text';
+          qInput.inputMode = 'numeric';
+          qInput.dataset.row = i;
+          qInput.dataset.col = j;
+          qInput.dataset.part = 'q';
+          qInput.placeholder = '商';
+          qInput.disabled = true;
+          qInput.addEventListener('input', onCellInput);
+          const rInput = document.createElement('input');
+          rInput.type = 'text';
+          rInput.inputMode = 'numeric';
+          rInput.dataset.row = i;
+          rInput.dataset.col = j;
+          rInput.dataset.part = 'r';
+          rInput.placeholder = '餘';
+          rInput.disabled = true;
+          rInput.addEventListener('input', onCellInput);
+          inputWrap.appendChild(qInput);
+          inputWrap.appendChild(rInput);
+          td.appendChild(inputWrap);
+          tr.appendChild(td);
+        }
+        gridEl.appendChild(tr);
+      }
+      return;
+    }
+
+    // --- 標準 100 格模式 (加/減/乘) ---
     // 第一列: 左上角空格 + 欄標題
     const headerRow = document.createElement('tr');
     const corner = document.createElement('td');
@@ -673,25 +819,12 @@
       const tr = document.createElement('tr');
       const rh = document.createElement('td');
       rh.className = 'question';
-      if (mode === 'div') {
-        rh.textContent = '÷' + rowHeaders[i];
-      } else {
-        rh.textContent = rowHeaders[i];
-      }
+      rh.textContent = rowHeaders[i];
       tr.appendChild(rh);
 
       for (let j = 0; j < 10; j++) {
         const td = document.createElement('td');
         td.className = 'cell';
-        if (mode === 'div') {
-          const span = document.createElement('span');
-          span.style.fontSize = '0.65rem';
-          span.style.color = '#7f8c8d';
-          span.style.display = 'block';
-          span.style.lineHeight = '1';
-          span.textContent = (rowHeaders[i] * colHeaders[j]);
-          td.appendChild(span);
-        }
         const input = document.createElement('input');
         input.type = 'text';
         input.inputMode = 'numeric';
@@ -716,7 +849,7 @@
     if (mode === 'add') return rowHeaders[row] + '+' + colHeaders[col];
     if (mode === 'sub') return rowHeaders[row] + '-' + colHeaders[col];
     if (mode === 'mul') return rowHeaders[row] + '×' + colHeaders[col];
-    if (mode === 'div') return (rowHeaders[row] * colHeaders[col]) + '÷' + rowHeaders[row];
+    if (mode === 'div') return gridQuestions[row][col] + '÷' + rowHeaders[row];
     if (mode.startsWith('mul') && mode.length > 3) {
       const N = parseInt(mode.slice(3), 10);
       return N + '×' + gridQuestions[0][col];
@@ -786,38 +919,51 @@
     const input = e.target;
     const row = +input.dataset.row;
     const col = +input.dataset.col;
+    const part = input.dataset.part; // 'q' 或 'r' (僅除法), 其他模式為 undefined
     const val = input.value.trim();
     if (val === '') {
       input.classList.remove('correct', 'wrong');
       return;
     }
     const expected = answers[row][col];
-    if (parseInt(val, 10) === expected) {
+    const isDiv = currentMode === 'div';
+    const expectedVal = isDiv ? expected[part] : expected;
+    const inputNum = parseInt(val, 10);
+
+    if (inputNum === expectedVal) {
       if (!input.classList.contains('correct')) {
         input.classList.remove('wrong');
         input.classList.add('correct');
         input.disabled = true;
-        input.value = '✓';  // 答對立刻隱藏答案, 防止後續偷瞄
-        // 計算這一題用時 (扣掉這段期間的暫停)
-        const now = performance.now();
-        const qElapsed = (now - lastAnswerTime) - (pausedTotal - pausedTotalAtLast);
-        questionTimes.push({
-          label: questionLabel(currentMode, row, col),
-          answer: expected,
-          ms: qElapsed
-        });
-        lastAnswerTime = now;
-        pausedTotalAtLast = pausedTotal;
-        filledCount++;
-        moveToNext(row, col);
-        const total = (currentMode.startsWith('mul') && currentMode.length > 3) ? 12 : 100;
-        if (filledCount >= total) finish();
+        // 除法: 保留答對的商/餘數字 (方便使用者在同格算另一格時參考)
+        // 其他模式: 答對立刻隱藏, 防止後續偷瞄
+        if (!isDiv) {
+          input.value = '✓';
+        }
+        // 除法: 商+餘都對才算「完成一格」並計時; 否則跳到同格的另一個輸入
+        if (isDiv) {
+          const cellTd = input.closest('td');
+          const otherInput = cellTd.querySelector(
+            'input[data-part="' + (part === 'q' ? 'r' : 'q') + '"]'
+          );
+          if (otherInput && otherInput.classList.contains('correct')) {
+            // 同格兩個都對了 → 整格完成, 把兩個 input 都藏成 ✓ 防止偷瞄
+            cellTd.querySelectorAll('input').forEach(i => { i.value = '✓'; });
+            recordCellDone(row, col);
+            moveToNext(row, col);
+          } else {
+            // 跳到同格的另一個輸入 (保留商/餘數字可見, 方便算另一欄)
+            if (otherInput) otherInput.focus();
+          }
+        } else {
+          recordCellDone(row, col);
+          moveToNext(row, col);
+        }
       }
     } else {
       // 只有當輸入位數達到預期才判錯, 否則等使用者繼續打
-      if (val.length >= String(expected).length) {
+      if (val.length >= String(expectedVal).length) {
         input.classList.add('wrong');
-        // 允許修改
         setTimeout(() => {
           input.classList.remove('wrong');
           input.value = '';
@@ -825,6 +971,26 @@
         }, 400);
       }
     }
+  }
+
+  // 完成一格的記錄 (計時、filledCount++、檢查完成)
+  function recordCellDone(row, col) {
+    const now = performance.now();
+    const qElapsed = (now - lastAnswerTime) - (pausedTotal - pausedTotalAtLast);
+    const expected = answers[row][col];
+    const ansDisplay = (currentMode === 'div')
+      ? (expected.r === 0 ? expected.q : (expected.q + '...' + expected.r))
+      : expected;
+    questionTimes.push({
+      label: questionLabel(currentMode, row, col),
+      answer: ansDisplay,
+      ms: qElapsed
+    });
+    lastAnswerTime = now;
+    pausedTotalAtLast = pausedTotal;
+    filledCount++;
+    const total = (currentMode.startsWith('mul') && currentMode.length > 3) ? 12 : 100;
+    if (filledCount >= total) finish();
   }
 
   function moveToNext(row, col) {
@@ -865,6 +1031,7 @@
     pauseBtn.classList.remove('paused');
     pauseBtn.disabled = false;
     resetBtn.disabled = false;
+    finishBtn.disabled = false;
     resultEl.classList.remove('show');
 
     // 啟用所有輸入
@@ -884,16 +1051,21 @@
     questionTimes = [];
   }
 
-  function finish() {
+  function finish(early) {
     const elapsed = stopTimer();
     const hadPause = pausedTotal > 0;
+    const total = (currentMode.startsWith('mul') && currentMode.length > 3) ? 12 : 100;
+    const done = filledCount; // 已完成題數
     // 儲存到 localStorage
     try {
       saveRecord({
         mode: currentMode,
         timeMs: elapsed,
         timestamp: Date.now(),
-        paused: hadPause
+        paused: hadPause,
+        early: !!early,
+        done: done,
+        total: total
       });
     } catch (e) { /* 忽略存檔失敗, 不影響遊戲 */ }
     started = false;
@@ -902,32 +1074,43 @@
     pauseBtn.textContent = '暫停';
     pauseBtn.classList.remove('paused');
     resetBtn.disabled = true;
-    // 完成後還原所有答案 (作答中是 ✓, 完成後顯示正確答案供檢視)
+    finishBtn.disabled = true;
+    // 還原所有答案 (作答中是 ✓, 結束後顯示正確答案供檢視)
     gridEl.querySelectorAll('input').forEach(inp => {
       const r = +inp.dataset.row;
       const c = +inp.dataset.col;
+      const part = inp.dataset.part;
       if (answers[r] && answers[r][c] !== undefined) {
-        inp.value = answers[r][c];
+        const ans = answers[r][c];
+        if (part === 'q') inp.value = ans.q;
+        else if (part === 'r') inp.value = ans.r;
+        else inp.value = ans;
       }
     });
-    const total = (currentMode.startsWith('mul') && currentMode.length > 3) ? 12 : 100;
+    // 結果文字
+    const resultTitle = document.querySelector('.result h2');
+    if (resultTitle) resultTitle.textContent = early ? '提早結束' : '完成!';
     document.getElementById('finalTime').textContent = ' ' + formatTime(elapsed);
-    document.getElementById('correctCount').textContent = ' ' + total;
+    document.getElementById('correctCount').textContent = ' ' + done;
     document.getElementById('totalCount').textContent = total;
 
-    // 最久的 3 題
+    // 最久的 3 題 (只取已完成的)
     const slowestList = document.getElementById('slowestList');
     slowestList.innerHTML = '';
     const top3 = questionTimes.slice().sort((a,b) => b.ms - a.ms).slice(0, 3);
-    top3.forEach((q, idx) => {
-      const row = document.createElement('div');
-      row.className = 'slow-row';
-      row.innerHTML =
-        '<span><span class="rank r' + (idx+1) + '">' + (idx+1) + '</span>'
-        + '<span class="qtext">' + q.label + ' = ' + q.answer + '</span></span>'
-        + '<span class="qtime">' + (q.ms / 1000).toFixed(2) + ' 秒</span>';
-      slowestList.appendChild(row);
-    });
+    if (top3.length === 0) {
+      slowestList.innerHTML = '<div style="color:#95a5a6;text-align:center;padding:8px;">沒有完成的題目</div>';
+    } else {
+      top3.forEach((q, idx) => {
+        const row = document.createElement('div');
+        row.className = 'slow-row';
+        row.innerHTML =
+          '<span><span class="rank r' + (idx+1) + '">' + (idx+1) + '</span>'
+          + '<span class="qtext">' + q.label + ' = ' + q.answer + '</span></span>'
+          + '<span class="qtime">' + (q.ms / 1000).toFixed(2) + ' 秒</span>';
+        slowestList.appendChild(row);
+      });
+    }
 
     resultEl.classList.add('show');
     startBtn.textContent = '開始挑戰';
@@ -955,6 +1138,11 @@
 
   // 3 秒倒數: 顯示 3 → 2 → 1 → GO!, 結束後才真正開始
   function runCountdownThenStart() {
+    // 若上一輪處於暫停狀態, 先徹底清掉暫停相關的 UI 與狀態
+    paused = false;
+    pauseOverlay.classList.remove('show');
+    pauseBtn.textContent = '暫停';
+    pauseBtn.classList.remove('paused');
     // 預先建立題目, 讓使用者看到題目板已就位
     generateHeaders(currentMode);
     computeAnswers(currentMode);
@@ -1013,6 +1201,7 @@
     pauseBtn.classList.remove('paused');
     pauseBtn.disabled = true;
     resetBtn.disabled = true;
+    finishBtn.disabled = true;
     startBtn.textContent = '開始挑戰';
     resultEl.classList.remove('show');
     // 重新建立預覽空格
@@ -1021,6 +1210,24 @@
     buildGrid(currentMode);
   }
   resetBtn.addEventListener('click', resetChallenge);
+
+  // --- 結束挑戰: 停止計時, 把已完成的部分當作成果存下來 ---
+  function finishEarly() {
+    if (!started) return;
+    // 暫停中先解除暫停, 不然時間算不準
+    if (paused) {
+      paused = false;
+      pausedTotal += performance.now() - pauseStartTime;
+      pauseOverlay.classList.remove('show');
+      pauseBtn.textContent = '暫停';
+      pauseBtn.classList.remove('paused');
+    }
+    if (!confirm('確定要結束這次挑戰嗎?\n已完成 ' + filledCount + ' 題的成績會存入紀錄。')) {
+      return;
+    }
+    finish(true); // true = 提早結束
+  }
+  finishBtn.addEventListener('click', finishEarly);
 
   // --- 歷史成績 / 導出 / 清除 ---
   const STORAGE_KEY = 'math100_records_v1';
@@ -1063,12 +1270,12 @@
   function renderHistory() {
     const records = loadRecords();
 
-    // 最佳紀錄
+    // 最佳紀錄 (排除暫停 + 提早結束)
     const bestWrap = document.getElementById('bestRecords');
     bestWrap.innerHTML = '';
     const bestByMode = {};
     records.forEach(r => {
-      if (r.paused) return; // 有暫停的不列入最佳
+      if (r.paused || r.early) return; // 暫停或提早結束的不列入最佳
       if (!bestByMode[r.mode] || r.timeMs < bestByMode[r.mode].timeMs) {
         bestByMode[r.mode] = r;
       }
@@ -1092,13 +1299,20 @@
     const sorted = records.slice().sort((a,b) => b.timestamp - a.timestamp);
     const table = document.createElement('table');
     table.className = 'history-table';
-    table.innerHTML = '<thead><tr><th>日期</th><th>模式</th><th>用時</th></tr></thead>';
+    table.innerHTML = '<thead><tr><th>日期</th><th>模式</th><th>用時</th><th>完成度</th></tr></thead>';
     const tbody = document.createElement('tbody');
     sorted.forEach(r => {
       const tr = document.createElement('tr');
+      const tags = (r.paused ? '<span class="paused-tag">含暫停</span>' : '')
+                 + (r.early ? '<span class="paused-tag" style="background:#fadbd8;color:#c0392b;">提早</span>' : '');
+      // 舊紀錄沒有 done/total, 直接標完成
+      const progress = (r.done !== undefined && r.total !== undefined)
+        ? (r.done + '/' + r.total)
+        : '完成';
       tr.innerHTML = '<td>' + formatDate(r.timestamp) + '</td>'
-        + '<td>' + (modeNames[r.mode] || r.mode) + (r.paused ? '<span class="paused-tag">含暫停</span>' : '') + '</td>'
-        + '<td class="time">' + formatTime(r.timeMs) + '</td>';
+        + '<td>' + (modeNames[r.mode] || r.mode) + tags + '</td>'
+        + '<td class="time">' + formatTime(r.timeMs) + '</td>'
+        + '<td>' + progress + '</td>';
       tbody.appendChild(tr);
     });
     table.appendChild(tbody);
@@ -1113,10 +1327,10 @@
     }
     const sorted = records.slice().sort((a,b) => b.timestamp - a.timestamp);
 
-    // 算出各模式最佳紀錄 (不含暫停)
+    // 算出各模式最佳紀錄 (不含暫停與提早結束)
     const bestByMode = {};
     records.forEach(r => {
-      if (r.paused) return;
+      if (r.paused || r.early) return;
       if (!bestByMode[r.mode] || r.timeMs < bestByMode[r.mode].timeMs) {
         bestByMode[r.mode] = r;
       }
@@ -1135,16 +1349,20 @@
     });
     lines.push('');
     lines.push('----- 所有紀錄 (由新到舊) -----');
-    lines.push('日期              模式                  用時         備註');
-    lines.push('-----------------------------------------------------------');
+    lines.push('日期              模式                  用時         完成度      備註');
+    lines.push('--------------------------------------------------------------------');
     sorted.forEach(r => {
       const dateStr = formatDate(r.timestamp).padEnd(18, ' ');
-      // 中文字元寬度約 2 個英文字, 所以 padEnd 不完全準, 但可接受
       const modeStr = (modeNames[r.mode] || r.mode);
       const modePad = padEndCJK(modeStr, 22);
       const timeStr = formatTime(r.timeMs).padEnd(13, ' ');
-      const note = r.paused ? '含暫停' : '';
-      lines.push(dateStr + modePad + timeStr + note);
+      const progress = (r.done !== undefined && r.total !== undefined)
+        ? (r.done + '/' + r.total) : '完成';
+      const progPad = progress.padEnd(11, ' ');
+      const notes = [];
+      if (r.paused) notes.push('含暫停');
+      if (r.early) notes.push('提早');
+      lines.push(dateStr + modePad + timeStr + progPad + notes.join(' '));
     });
 
     const txt = lines.join('\n');
