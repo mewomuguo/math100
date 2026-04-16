@@ -1,7 +1,7 @@
 [README-batch1.md](https://github.com/user-attachments/files/26776010/README-batch1.md)
 # 第 1 批: PWA 化 - 部署說明
 
-這一批做完後,你的網頁就升級成 PWA (漸進式網頁應用程式),
+網頁就升級成 PWA (漸進式網頁應用程式),
 - 可在手機/桌面「加入主畫面」變成 App
 - 完全離線可用
 - 是後續第 2 批 Capacitor 打包成 Android App 的基礎
