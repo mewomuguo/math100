@@ -1,7 +1,7 @@
 {
-  "name": "數學一百格",
-  "short_name": "數學100",
-  "description": "100 格四則運算練習,加法、減法、乘法、除法、單一乘法表",
+  "name": "Math100",
+  "short_name": "Math100",
+  "description": "100",
   "lang": "zh-TW",
   "start_url": "./index.html",
   "scope": "./",
