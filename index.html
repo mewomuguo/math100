@@ -1,1428 +1,318 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>數學一百格</title>
-<meta name="description" content="100 格四則運算練習,加法、減法、乘法、除法、單一乘法表">
-<meta name="theme-color" content="#3498db">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Hundred-Square Math</title>
+<meta name="description" content="100-square arithmetic practice">
+<meta name="theme-color" content="#a8d8ea">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="數學一百格">
+<meta name="apple-mobile-web-app-title" content="Hundred-Square Math">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
-    background: #f5f7fa;
-    margin: 0;
-    padding: 20px;
-    color: #2c3e50;
-  }
-  .container {
-    max-width: 720px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    padding: 24px;
-  }
-  h1 {
-    text-align: center;
-    color: #2c3e50;
-    margin: 0 0 8px;
-    font-size: 1.6rem;
-  }
-  .subtitle {
-    text-align: center;
-    color: #7f8c8d;
-    margin: 0 0 20px;
-    font-size: 0.9rem;
-  }
-  .timer {
-    text-align: center;
-    font-size: 2.2rem;
-    font-family: "Courier New", monospace;
-    font-weight: bold;
-    color: #e74c3c;
-    margin: 12px 0;
-    letter-spacing: 2px;
-  }
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-    margin-bottom: 16px;
-  }
-  .mode-btn {
-    padding: 8px 14px;
-    border: 2px solid #3498db;
-    background: white;
-    color: #3498db;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.15s;
-  }
-  .mode-btn:hover { background: #ecf4fb; }
-  .mode-btn.active {
-    background: #3498db;
-    color: white;
-  }
-  .start-btn {
-    display: block;
-    margin: 0 auto 20px;
-    padding: 12px 36px;
-    background: #27ae60;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .start-btn:hover { background: #219a52; }
-  .start-btn:disabled {
-    background: #95a5a6;
-    cursor: not-allowed;
-  }
-  .action-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  .action-buttons .start-btn { margin: 0; }
-  .pause-btn {
-    padding: 12px 28px;
-    background: #f39c12;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .pause-btn:hover { background: #d68910; }
-  .pause-btn:disabled {
-    background: #bdc3c7;
-    cursor: not-allowed;
-  }
-  .pause-btn.paused { background: #3498db; }
-  .pause-btn.paused:hover { background: #2980b9; }
-  .reset-btn {
-    padding: 12px 22px;
-    background: #9b59b6;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .reset-btn:hover { background: #7d3c98; }
-  .reset-btn:disabled {
-    background: #bdc3c7;
-    cursor: not-allowed;
-  }
-  .finish-btn {
-    padding: 12px 22px;
-    background: #2c3e50;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .finish-btn:hover { background: #1b2631; }
-  .finish-btn:disabled {
-    background: #bdc3c7;
-    cursor: not-allowed;
-  }
-  .action-buttons.secondary {
-    margin-top: -10px;
-    margin-bottom: 20px;
-  }
-  .record-btn {
-    padding: 8px 18px;
-    background: #ecf0f1;
-    color: #34495e;
-    border: 1px solid #bdc3c7;
-    border-radius: 6px;
-    font-size: 0.88rem;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .record-btn:hover {
-    background: #d5dbdb;
-  }
-  .record-btn.danger {
-    color: #c0392b;
-    border-color: #e6b0aa;
-  }
-  .record-btn.danger:hover {
-    background: #fadbd8;
-  }
-  /* --- Modal --- */
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    padding: 20px;
-  }
-  .modal-backdrop.show { display: flex; }
-  .modal {
-    background: white;
-    border-radius: 12px;
-    max-width: 640px;
-    width: 100%;
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  }
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid #ecf0f1;
-  }
-  .modal-header h2 {
-    margin: 0;
-    font-size: 1.2rem;
-  }
-  .modal-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #7f8c8d;
-    padding: 0 8px;
-  }
-  .modal-close:hover { color: #2c3e50; }
-  .modal-body {
-    padding: 16px 20px;
-    overflow-y: auto;
-  }
-  .best-records {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-  .best-record {
-    background: #fef9e7;
-    border: 1px solid #f9e79f;
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 0.88rem;
-  }
-  .best-record .mode-name {
-    font-weight: bold;
-    color: #9a7d0a;
-  }
-  .best-record .best-time {
-    font-family: "Courier New", monospace;
-    color: #e67e22;
-    font-size: 1rem;
-  }
-  .history-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-  }
-  .history-table th, .history-table td {
-    padding: 8px 10px;
-    text-align: left;
-    border-bottom: 1px solid #ecf0f1;
-  }
-  .history-table th {
-    background: #f8f9fa;
-    color: #7f8c8d;
-    font-weight: 600;
-    font-size: 0.8rem;
-    position: sticky;
-    top: 0;
-  }
-  .history-table td.time {
-    font-family: "Courier New", monospace;
-  }
-  .history-empty {
-    text-align: center;
-    color: #95a5a6;
-    padding: 30px 20px;
-  }
-  .paused-tag {
-    display: inline-block;
-    font-size: 0.7rem;
-    background: #fff3e0;
-    color: #e67e22;
-    padding: 1px 6px;
-    border-radius: 3px;
-    margin-left: 4px;
-  }
-  .controls-times {
-    border-top: 1px dashed #d5dbdb;
-    padding-top: 12px;
-    margin-top: 4px;
-  }
-  .controls-label {
-    width: 100%;
-    text-align: center;
-    font-size: 0.85rem;
-    color: #7f8c8d;
-    margin-bottom: 4px;
-  }
-  .grid-wrapper {
-    overflow-x: auto;
-    position: relative;
-  }
-  .pause-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(44, 62, 80, 0.85);
-    color: white;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.6rem;
-    font-weight: bold;
-    border-radius: 8px;
-    z-index: 5;
-  }
-  .pause-overlay.show { display: flex; }
+:root{--ivory:#fdfaf1;--cream:#f6efde;--washi:#efe6d2;--sky-50:#eef6fb;--sky-100:#d7ebf4;--sky-200:#a8d8ea;--sky-300:#7cb8d6;--sky-400:#4f92b5;--ink-600:#5a6b70;--ink-800:#2d3e44;--sakura:#f0c8c8;--sakura-deep:#c97e7e;--matcha:#bcd4b2;--matcha-deep:#6a9466;--gold:#e4b870;--gold-soft:#f7e7c7;--radius-lg:20px;--radius-xl:28px;--shadow-sm:0 1px 2px rgba(45,62,68,.06),0 2px 6px rgba(45,62,68,.04);--shadow-md:0 2px 8px rgba(45,62,68,.08),0 8px 20px rgba(45,62,68,.06);--shadow-lg:0 4px 16px rgba(45,62,68,.10),0 16px 40px rgba(45,62,68,.08);--safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);--font-display:'Shippori Mincho','Noto Serif TC',serif;--font-body:'Noto Sans TC',-apple-system,'Microsoft JhengHei',sans-serif;--font-num:'M PLUS Rounded 1c','Noto Sans TC',sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;padding:0;overscroll-behavior:none}
+body{font-family:var(--font-body);background:var(--ivory);background-image:radial-gradient(circle at 20% 15%,rgba(168,216,234,.18) 0%,transparent 45%),radial-gradient(circle at 85% 85%,rgba(240,200,200,.12) 0%,transparent 45%),radial-gradient(rgba(90,107,112,.035) 1px,transparent 1px);background-size:100% 100%,100% 100%,8px 8px;color:var(--ink-800);min-height:100dvh;padding-top:var(--safe-top);font-size:15px;line-height:1.5}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.home{max-width:480px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;align-items:center}
+.appbar{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 0 14px}
+.brand{display:flex;align-items:baseline;gap:8px}
+.brand-seal{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--sky-200);color:#fff;font-family:var(--font-display);font-weight:700;font-size:.85rem;border-radius:6px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4),var(--shadow-sm);transform:rotate(-4deg)}
+.brand-title{font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin:0}
+.brand-sub{font-size:.7rem;color:var(--ink-600);letter-spacing:.1em}
+.iconbtn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:inline-flex;align-items:center;justify-content:center;color:var(--ink-600);box-shadow:var(--shadow-sm);transition:transform .15s}
+.iconbtn:active{transform:scale(.92)}.iconbtn svg{width:22px;height:22px}
+.timer-card{background:linear-gradient(135deg,#fff 0%,var(--sky-50) 100%);border-radius:var(--radius-lg);padding:18px 20px;text-align:center;box-shadow:var(--shadow-md);width:100%;position:relative;overflow:hidden;margin-bottom:16px}
+.timer-card::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(168,216,234,.35) 0%,transparent 70%);pointer-events:none}
+.timer-label{font-size:.68rem;letter-spacing:.3em;color:var(--ink-600);margin:0 0 4px;position:relative;z-index:1}
+.timer{font-family:var(--font-num);font-size:2.4rem;font-weight:800;color:var(--ink-800);margin:0;letter-spacing:.02em;font-variant-numeric:tabular-nums;position:relative;z-index:1;line-height:1.1}
+.timer.running{color:var(--sky-400)}.timer.paused-color{color:var(--gold)}
+.timer-mode{font-size:.78rem;color:var(--ink-600);margin-top:6px;position:relative;z-index:1}
+.timer-mode strong{color:var(--sky-400);font-weight:700;font-family:var(--font-display)}
+.modes{width:100%;margin-bottom:16px}
+.modes-head{display:flex;align-items:center;justify-content:space-between;padding:0 4px 8px}
+.modes-title{font-size:.78rem;letter-spacing:.15em;color:var(--ink-600);font-weight:500}
+.modes-more{font-size:.8rem;color:var(--sky-400);font-weight:500;display:flex;align-items:center;gap:2px}
+.chips-wrap{position:relative}.chips-wrap::after{content:'';position:absolute;top:0;right:0;bottom:8px;width:32px;background:linear-gradient(to right,transparent 0%,var(--ivory) 90%);pointer-events:none}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 24px 8px 4px;scrollbar-width:none;scroll-snap-type:x proximity}.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;scroll-snap-align:start;padding:9px 16px;background:#fff;color:var(--ink-800);border-radius:999px;font-size:.88rem;font-weight:500;box-shadow:var(--shadow-sm);transition:all .15s;white-space:nowrap;border:1.5px solid transparent}
+.chip:active{transform:scale(.96)}.chip.active{background:var(--sky-200);color:#fff;border-color:var(--sky-300);box-shadow:0 2px 8px rgba(124,184,214,.35)}
 
-  /* --- 3 秒倒數 --- */
-  .countdown-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(44, 62, 80, 0.88);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 200;
-  }
-  .countdown-overlay.show { display: flex; }
-  .countdown-num {
-    font-size: 12rem;
-    font-weight: bold;
-    color: white;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    font-family: -apple-system, "Segoe UI", sans-serif;
-    animation: countdownPop 1s ease-out;
-  }
-  .countdown-num.go {
-    color: #2ecc71;
-    font-size: 8rem;
-  }
-  @keyframes countdownPop {
-    0%   { transform: scale(0.3); opacity: 0; }
-    30%  { transform: scale(1.2); opacity: 1; }
-    70%  { transform: scale(1); opacity: 1; }
-    100% { transform: scale(0.85); opacity: 0.3; }
-  }
-  table.grid {
-    border-collapse: collapse;
-    margin: 0 auto;
-    background: white;
-  }
-  table.grid td {
-    border: 1px solid #bdc3c7;
-    width: 56px;
-    height: 48px;
-    text-align: center;
-    padding: 0;
-    font-size: 1rem;
-  }
-  table.grid td.header {
-    background: #34495e;
-    color: white;
-    font-weight: bold;
-  }
-  table.grid td.question {
-    background: #ecf0f1;
-    font-weight: bold;
-    color: #2c3e50;
-  }
-  table.grid td.cell {
-    position: relative;
-  }
-  /* 除法模式: 格子加寬, 內含被除數 + 商/餘 */
-  table.grid td.div-cell {
-    width: 72px;
-    height: 64px;
-    padding: 2px;
-    vertical-align: top;
-  }
-  table.grid .div-dividend {
-    font-size: 0.95rem;
-    font-weight: bold;
-    color: #2980b9;
-    text-align: center;
-    line-height: 1.1;
-    padding-top: 2px;
-  }
-  table.grid .div-inputs {
-    display: flex;
-    gap: 1px;
-    justify-content: center;
-    align-items: center;
-    margin-top: 2px;
-  }
-  table.grid .div-inputs input {
-    width: 48%;
-    height: 26px;
-    border: 1px solid #d5dbdb;
-    border-radius: 3px;
-    text-align: center;
-    font-size: 0.85rem;
-    background: white;
-    padding: 0;
-  }
-  table.grid .div-inputs input::placeholder {
-    color: #bdc3c7;
-    font-size: 0.7rem;
-  }
-  table.grid .div-inputs input:focus {
-    background: #fff9c4;
-    outline: none;
-    border-color: #f39c12;
-  }
-  table.grid .div-inputs input.correct {
-    background: #d5f5e3;
-    color: #27ae60;
-    font-weight: bold;
-    border-color: #a9dfbf;
-  }
-  table.grid .div-inputs input.wrong {
-    background: #fadbd8;
-    color: #e74c3c;
-    font-weight: bold;
-    border-color: #e6b0aa;
-  }
-  /* 單一乘法表模式: 格子放大 */
-  table.grid.single-mul td {
-    width: 52px;
-    height: 58px;
-    font-size: 1.15rem;
-  }
-  table.grid.single-mul td.question {
-    font-size: 1.3rem;
-    color: #2980b9;
-  }
-  table.grid input {
-    width: 100%;
-    height: 100%;
-    border: none;
-    text-align: center;
-    font-size: 1rem;
-    background: transparent;
-    outline: none;
-    padding: 0;
-  }
-  table.grid input:focus {
-    background: #fff9c4;
-  }
-  table.grid input.correct {
-    background: #d5f5e3;
-    color: #27ae60;
-    font-weight: bold;
-  }
-  table.grid input.wrong {
-    background: #fadbd8;
-    color: #e74c3c;
-    font-weight: bold;
-  }
-  .result {
-    text-align: center;
-    margin-top: 20px;
-    padding: 16px;
-    background: #eafaf1;
-    border-radius: 8px;
-    display: none;
-  }
-  .result.show { display: block; }
-  .result h2 { margin: 0 0 8px; color: #27ae60; }
-  .result p { margin: 4px 0; }
-  .slowest {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px dashed #a9dfbf;
-    text-align: left;
-    max-width: 380px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .slowest h3 {
-    margin: 0 0 10px;
-    font-size: 0.95rem;
-    color: #c0392b;
-    text-align: center;
-  }
-  .slow-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 12px;
-    background: white;
-    border: 1px solid #e8daef;
-    border-radius: 6px;
-    margin-bottom: 6px;
-    font-size: 0.95rem;
-  }
-  .slow-row .rank {
-    display: inline-block;
-    width: 22px;
-    height: 22px;
-    line-height: 22px;
-    text-align: center;
-    background: #e74c3c;
-    color: white;
-    border-radius: 50%;
-    font-size: 0.78rem;
-    font-weight: bold;
-    margin-right: 8px;
-  }
-  .slow-row .rank.r2 { background: #e67e22; }
-  .slow-row .rank.r3 { background: #f39c12; }
-  .slow-row .qtext {
-    font-family: "Courier New", monospace;
-    font-weight: bold;
-    color: #2c3e50;
-    flex: 1;
-  }
-  .slow-row .qtime {
-    font-family: "Courier New", monospace;
-    color: #c0392b;
-    font-weight: bold;
-  }
+
+.home-modes{width:100%;margin-bottom:14px}
+.home-modes .mode-section{margin-bottom:14px}
+.home-modes .mode-section-title{font-family:var(--font-display);font-size:.9rem;margin:0 0 8px;display:flex;align-items:center;gap:8px;padding:0 4px}
+.home-modes .mode-section-title::before{content:'';width:3px;height:14px;background:var(--sky-300);border-radius:2px}
+.home-modes .mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0 4px}
+.home-modes .mode-card{padding:12px 10px;background:#fff;border-radius:14px;box-shadow:var(--shadow-sm);text-align:left;transition:all .15s;border:2px solid transparent}
+.home-modes .mode-card:active{transform:scale(.97)}
+.home-modes .mode-card.active{background:linear-gradient(135deg,var(--sky-100),var(--sky-50));border-color:var(--sky-300)}
+.home-modes .mode-card .mode-name{font-family:var(--font-display);font-size:.95rem;font-weight:700;margin-bottom:1px}
+.home-modes .mode-card .mode-range{font-size:.72rem;color:var(--ink-600);font-family:var(--font-num)}
+.home-modes .mode-card.active .mode-range{color:var(--sky-400)}
+.home-modes .mode-grid.times{grid-template-columns:repeat(4,1fr);gap:6px}
+.home-modes .mode-grid.times .mode-card{padding:10px 6px;text-align:center}
+.home-modes .mode-grid.times .mode-name{font-size:.92rem;margin:0}
+.count-section{width:100%;margin-bottom:14px}
+.count-title{font-size:.78rem;letter-spacing:.15em;color:var(--ink-600);font-weight:500;padding:0 4px 8px}
+.count-chips{display:flex;gap:8px;justify-content:center;padding:0 4px}
+.count-chip{flex:1;padding:10px 8px;background:#fff;color:var(--ink-800);border-radius:14px;font-size:.95rem;font-weight:600;font-family:var(--font-num);box-shadow:var(--shadow-sm);transition:all .15s;text-align:center;border:2px solid transparent}
+.count-chip:active{transform:scale(.96)}
+.count-chip.active{background:var(--sky-200);color:#fff;border-color:var(--sky-300);box-shadow:0 2px 8px rgba(124,184,214,.35)}
+.start-big{width:100%;padding:18px;background:linear-gradient(135deg,var(--sky-300),var(--sky-400));color:#fff;border-radius:18px;font-weight:700;font-size:1.15rem;box-shadow:0 4px 14px rgba(79,146,181,.35);transition:transform .12s;letter-spacing:.05em;margin-top:4px}
+.start-big:active{transform:scale(.97)}.start-big:disabled{background:#d5d0c2;box-shadow:none;opacity:.7}
+.quiz-overlay{position:fixed;inset:0;background:var(--ivory);background-image:radial-gradient(circle at 20% 15%,rgba(168,216,234,.12) 0%,transparent 45%),radial-gradient(circle at 85% 85%,rgba(240,200,200,.08) 0%,transparent 45%);z-index:200;display:none;flex-direction:column}
+.quiz-overlay.show{display:flex}
+.quiz-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;padding-top:calc(10px + var(--safe-top));background:rgba(253,250,241,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--washi);flex-shrink:0}
+.quiz-timer{font-family:var(--font-num);font-size:1.35rem;font-weight:800;color:var(--sky-400);font-variant-numeric:tabular-nums}
+.quiz-timer.paused-color{color:var(--gold)}
+.quiz-progress-text{font-size:.82rem;color:var(--ink-600);font-family:var(--font-num);font-weight:600}
+.quiz-btns{display:flex;gap:6px}
+.quiz-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.7);display:inline-flex;align-items:center;justify-content:center;color:var(--ink-600);box-shadow:var(--shadow-sm)}
+.quiz-btn:active{transform:scale(.9)}.quiz-btn svg{width:18px;height:18px}
+.quiz-btn.paused-state{background:var(--gold);color:#fff}
+.progress-wrap{width:100%;padding:0 14px 8px;flex-shrink:0}
+.progress-bar{width:100%;height:6px;background:var(--washi);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--sky-200),var(--sky-400));border-radius:3px;transition:width .35s cubic-bezier(.22,1,.36,1);width:0}
+.card-area{flex:1;display:flex;align-items:center;justify-content:center;padding:16px 20px;overflow:hidden}
+.q-card{background:#fff;border-radius:24px;box-shadow:var(--shadow-lg);padding:36px 24px 32px;text-align:center;width:100%;max-width:380px;position:relative;transition:transform .15s}
+.q-card.correct-flash{animation:cardCorrect .45s ease-out}
+.q-card.wrong-shake{animation:cardWrong .35s}
+@keyframes cardCorrect{0%{background:#fff;transform:scale(1)}35%{background:var(--matcha);transform:scale(1.04)}100%{background:#fff;transform:scale(1)}}
+@keyframes cardWrong{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.q-num{font-size:.72rem;letter-spacing:.2em;color:var(--ink-600);margin-bottom:8px;font-weight:500}
+.q-problem{font-family:var(--font-num);font-size:2.6rem;font-weight:800;color:var(--ink-800);line-height:1.2;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.q-op{color:var(--sky-400)}.q-eq{color:var(--washi);margin:0 2px}
+.q-input-wrap{display:flex;justify-content:center}
+.q-input{width:120px;height:64px;border:none;border-bottom:4px solid var(--sky-200);background:var(--sky-50);border-radius:16px 16px 0 0;text-align:center;font-family:var(--font-num);font-size:2.4rem;font-weight:800;color:var(--ink-800);outline:none;caret-color:var(--sky-400);transition:border-color .15s,background .15s}
+.q-input:focus{border-color:var(--sky-400);background:var(--gold-soft)}
+.q-input.correct{background:var(--matcha);border-color:var(--matcha-deep);color:var(--matcha-deep)}
+.q-input.wrong{background:var(--sakura);border-color:var(--sakura-deep);color:var(--sakura-deep)}
+.div-problem{font-family:var(--font-num);font-size:2.4rem;font-weight:800;color:var(--ink-800);margin-bottom:20px;text-align:center}
+.div-problem .q-op{color:var(--sky-400)}
+.div-inputs-row{display:flex;gap:16px;justify-content:center}
+.div-input-group{display:flex;flex-direction:column;align-items:center}
+.div-label{font-size:.7rem;letter-spacing:.15em;color:var(--ink-600);font-weight:600;margin-bottom:4px}
+.div-input{width:80px;height:56px;border:none;border-bottom:4px solid var(--washi);background:var(--sky-50);border-radius:14px 14px 0 0;text-align:center;font-family:var(--font-num);font-size:2rem;font-weight:800;color:var(--ink-800);outline:none;caret-color:var(--sky-400);transition:border-color .15s,background .15s}
+.div-input:focus{border-color:var(--sky-400);background:var(--gold-soft)}
+.div-input.correct,.div-input.done{background:var(--matcha);border-color:var(--matcha-deep);color:var(--matcha-deep)}
+.div-input.wrong{background:var(--sakura);border-color:var(--sakura-deep);color:var(--sakura-deep)}
+.quiz-pause{position:absolute;inset:0;background:rgba(253,250,241,.95);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border-radius:24px;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:5}
+.quiz-pause.show{display:flex}
+.quiz-pause .p-ico{font-size:3rem;color:var(--gold);margin-bottom:6px}
+.quiz-pause .p-txt{font-family:var(--font-display);font-size:1.3rem;letter-spacing:.15em}
+.countdown-overlay{position:fixed;inset:0;background:radial-gradient(circle at center,rgba(168,216,234,.95),rgba(79,146,181,.92));display:none;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.countdown-overlay.show{display:flex}
+.countdown-num{font-size:10rem;font-weight:800;color:#fff;font-family:var(--font-display);text-shadow:0 4px 30px rgba(0,0,0,.25);animation:countdownPop .9s ease-out}
+.countdown-num.go{font-size:7rem;animation:countdownPop .6s ease-out}
+@keyframes countdownPop{0%{transform:scale(.3);opacity:0}30%{transform:scale(1.15);opacity:1}70%{transform:scale(1);opacity:1}100%{transform:scale(.85);opacity:.3}}
+.result-card{background:linear-gradient(135deg,var(--matcha) 0%,#d3e3c9 100%);border-radius:var(--radius-lg);padding:20px;text-align:center;display:none;box-shadow:var(--shadow-md);width:100%;margin-top:16px;position:relative;overflow:hidden}
+.result-card::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:radial-gradient(circle,rgba(255,255,255,.4) 0%,transparent 70%)}
+.result-card.show{display:block}.result-card.early{background:linear-gradient(135deg,var(--gold-soft) 0%,#f9ddb6 100%)}
+.result-title{font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--matcha-deep);margin:0 0 10px;letter-spacing:.1em;position:relative;z-index:1}
+.result-card.early .result-title{color:#a67a3a}
+.result-stats{display:flex;justify-content:center;gap:24px;margin-bottom:4px;position:relative;z-index:1}
+.result-stat{text-align:center}.result-stat-label{font-size:.7rem;color:var(--ink-600);letter-spacing:.1em;margin-bottom:2px}
+.result-stat-value{font-family:var(--font-num);font-weight:800;color:var(--ink-800);font-size:1.25rem}
+.result-share-btn{margin-top:14px;padding:10px 22px;background:#fff;color:var(--matcha-deep);border-radius:12px;font-weight:700;font-size:.9rem;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow-sm);position:relative;z-index:1}
+.result-card.early .result-share-btn{color:#a67a3a}
+.result-share-btn:active{transform:scale(.97)}.result-share-btn svg{width:16px;height:16px}
+.slowest{margin-top:14px;padding:14px;background:rgba(255,255,255,.5);border-radius:12px;text-align:left;position:relative;z-index:1}
+.slowest h3{margin:0 0 10px;font-size:.85rem;color:var(--ink-800);font-family:var(--font-display);text-align:center;letter-spacing:.1em}
+.slow-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#fff;border-radius:10px;margin-bottom:6px;font-size:.9rem;box-shadow:var(--shadow-sm)}.slow-row:last-child{margin-bottom:0}
+.slow-row .rank{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:var(--sakura-deep);color:#fff;border-radius:50%;font-size:.72rem;font-weight:800;margin-right:8px;font-family:var(--font-num)}
+.slow-row .rank.r2{background:#d68950}.slow-row .rank.r3{background:var(--gold)}
+.slow-row .qtext{font-family:var(--font-num);font-weight:700;flex:1}.slow-row .qtime{font-family:var(--font-num);color:var(--sakura-deep);font-weight:700;font-size:.88rem}
+.sheet-backdrop{position:fixed;inset:0;background:rgba(45,62,68,.35);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s;z-index:90}.sheet-backdrop.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;background:var(--ivory);border-radius:var(--radius-xl) var(--radius-xl) 0 0;box-shadow:0 -8px 32px rgba(45,62,68,.18);max-height:85dvh;transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);z-index:100;display:flex;flex-direction:column;padding-bottom:var(--safe-bot)}.sheet.show{transform:translateY(0)}
+.sheet-handle{width:42px;height:4px;background:var(--washi);border-radius:2px;margin:10px auto 4px;flex-shrink:0}
+.sheet-header{padding:8px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--washi);flex-shrink:0}
+.sheet-title{font-family:var(--font-display);font-size:1.15rem;font-weight:700;margin:0;letter-spacing:.05em}
+.sheet-close{width:32px;height:32px;border-radius:50%;background:var(--washi);color:var(--ink-600);display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem}
+.sheet-body{padding:16px 20px 24px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+.menu-list{display:flex;flex-direction:column;gap:6px}
+.menu-item{display:flex;align-items:center;gap:14px;padding:14px;background:#fff;border-radius:14px;box-shadow:var(--shadow-sm);width:100%;text-align:left;font-size:.95rem;transition:transform .1s,background .15s}.menu-item:active{transform:scale(.98);background:var(--sky-50)}
+.menu-item .menu-ico{width:38px;height:38px;border-radius:10px;background:var(--sky-100);color:var(--sky-400);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}.menu-item .menu-ico svg{width:20px;height:20px}
+.menu-item.danger .menu-ico{background:#fbe8e8;color:var(--sakura-deep)}
+.menu-item .menu-text{flex:1}.menu-item .menu-text-main{font-weight:600}.menu-item .menu-text-sub{font-size:.78rem;color:var(--ink-600);margin-top:2px}.menu-item .menu-arrow{color:var(--ink-600);opacity:.5}
+.mode-section{margin-bottom:18px}.mode-section-title{font-family:var(--font-display);font-size:.95rem;margin:0 0 10px;display:flex;align-items:center;gap:8px}.mode-section-title::before{content:'';width:3px;height:14px;background:var(--sky-300);border-radius:2px}
+.mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.mode-card{padding:14px 12px;background:#fff;border-radius:14px;box-shadow:var(--shadow-sm);text-align:left;transition:all .15s;border:2px solid transparent}.mode-card:active{transform:scale(.97)}.mode-card.active{background:linear-gradient(135deg,var(--sky-100),var(--sky-50));border-color:var(--sky-300)}
+.mode-card .mode-name{font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:2px}.mode-card .mode-range{font-size:.75rem;color:var(--ink-600);font-family:var(--font-num)}.mode-card.active .mode-range{color:var(--sky-400)}
+.mode-grid.times{grid-template-columns:repeat(4,1fr);gap:6px}.mode-grid.times .mode-card{padding:10px 6px;text-align:center}.mode-grid.times .mode-name{font-size:.95rem;margin:0}
+.best-records{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:22px}
+.best-record{background:linear-gradient(135deg,#fff,var(--gold-soft));border:1px solid rgba(228,184,112,.3);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow-sm)}.best-record .mode-name{font-size:.75rem;color:var(--ink-600);margin-bottom:2px;font-weight:500}.best-record .best-time{font-family:var(--font-num);font-weight:800;color:var(--gold);font-size:1.05rem}.best-record.empty .best-time{color:var(--washi)}
+.section-sublabel{font-family:var(--font-display);font-size:.95rem;margin:4px 0 10px;display:flex;align-items:center;gap:8px}.section-sublabel::before{content:'';width:3px;height:14px;background:var(--gold);border-radius:2px}
+.history-list{display:flex;flex-direction:column;gap:8px}
+.history-row{background:#fff;border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-sm);display:grid;grid-template-columns:1fr auto;gap:4px 12px}.history-row .h-date{font-size:.75rem;color:var(--ink-600);font-family:var(--font-num)}.history-row .h-mode{font-size:.88rem;font-weight:600}.history-row .h-time{font-family:var(--font-num);font-weight:700;color:var(--sky-400);font-size:1rem;grid-row:span 2;display:flex;align-items:center}.history-row .h-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;grid-column:1}
+.tag{display:inline-block;font-size:.68rem;padding:2px 7px;border-radius:6px;font-weight:500}.tag.paused{background:var(--gold-soft);color:#a67a3a}.tag.early{background:#fde3e3;color:var(--sakura-deep)}.tag.progress{background:var(--sky-50);color:var(--sky-400);font-family:var(--font-num)}
+.history-empty{text-align:center;color:var(--ink-600);padding:36px 20px;background:#fff;border-radius:14px;font-size:.9rem}
+.toast{position:fixed;bottom:calc(30px + var(--safe-bot));left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink-800);color:#fff;padding:10px 20px;border-radius:999px;font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:400;box-shadow:var(--shadow-lg);max-width:80%;text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:360px){.q-problem{font-size:2.2rem}.q-input{width:100px;height:56px;font-size:2rem}.div-input{width:68px;height:50px;font-size:1.7rem}.countdown-num{font-size:8rem}.countdown-num.go{font-size:5.5rem}}
+@media(min-width:520px){.q-problem{font-size:3rem}.q-input{width:140px;height:72px;font-size:2.8rem}.div-input{width:100px;height:64px;font-size:2.4rem}}
 </style>
 </head>
 <body>
-
-<div class="container">
-  <h1>數學一百格</h1>
-  <p class="subtitle">100 格四則運算練習</p>
-
-  <div class="timer" id="timer">00:00.00</div>
-
-  <div class="controls">
-    <button class="mode-btn active" data-mode="add">加法 (0-9)</button>
-    <button class="mode-btn" data-mode="sub">減法 (10-19 減 0-9)</button>
-    <button class="mode-btn" data-mode="mul">乘法 (0-9)</button>
-    <button class="mode-btn" data-mode="div">除法 (10-99 除 1-9)</button>
+<div class="home" id="homeScreen">
+  <div class="appbar"><div class="brand"><span class="brand-seal">百</span><div><div class="brand-title">Hundred-Square</div><div class="brand-sub">HYAKU·MASU</div></div></div>
+    <button class="iconbtn" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg></button></div>
+  <div class="timer-card"><div class="timer-label">TIMER</div><div class="timer" id="timer">00:00.00</div><div class="timer-mode">Mode · <strong id="currentModeLabel">Addition 0–9</strong> · <span id="countLabel">100</span>Q</div></div>
+  <div class="home-modes">
+    <div class="mode-section"><h4 class="mode-section-title">Arithmetic · 100 squares</h4><div class="mode-grid">
+      <button class="mode-card home-mode active" data-mode="add"><div class="mode-name">Addition</div><div class="mode-range">0–9 + 0–9</div></button>
+      <button class="mode-card home-mode" data-mode="sub"><div class="mode-name">Subtraction</div><div class="mode-range">10–19 − 0–9</div></button>
+      <button class="mode-card home-mode" data-mode="mul"><div class="mode-name">Multiplication</div><div class="mode-range">0–9 × 0–9</div></button>
+      <button class="mode-card home-mode" data-mode="div"><div class="mode-name">Division</div><div class="mode-range">10–99 ÷ 1–9</div></button></div></div>
+    <div class="mode-section"><h4 class="mode-section-title">Times Table · 12 squares</h4><div class="mode-grid times">
+      <button class="mode-card home-mode" data-mode="mul2"><div class="mode-name">×2</div></button>
+      <button class="mode-card home-mode" data-mode="mul3"><div class="mode-name">×3</div></button>
+      <button class="mode-card home-mode" data-mode="mul4"><div class="mode-name">×4</div></button>
+      <button class="mode-card home-mode" data-mode="mul5"><div class="mode-name">×5</div></button>
+      <button class="mode-card home-mode" data-mode="mul6"><div class="mode-name">×6</div></button>
+      <button class="mode-card home-mode" data-mode="mul7"><div class="mode-name">×7</div></button>
+      <button class="mode-card home-mode" data-mode="mul8"><div class="mode-name">×8</div></button>
+      <button class="mode-card home-mode" data-mode="mul9"><div class="mode-name">×9</div></button></div></div>
   </div>
-
-  <div class="controls controls-times">
-    <span class="controls-label">單一乘法表 (×1~12):</span>
-    <button class="mode-btn" data-mode="mul2">2 的乘法</button>
-    <button class="mode-btn" data-mode="mul3">3 的乘法</button>
-    <button class="mode-btn" data-mode="mul4">4 的乘法</button>
-    <button class="mode-btn" data-mode="mul5">5 的乘法</button>
-    <button class="mode-btn" data-mode="mul6">6 的乘法</button>
-    <button class="mode-btn" data-mode="mul7">7 的乘法</button>
-    <button class="mode-btn" data-mode="mul8">8 的乘法</button>
-    <button class="mode-btn" data-mode="mul9">9 的乘法</button>
-  </div>
-
-  <div class="action-buttons">
-    <button class="start-btn" id="startBtn">開始挑戰</button>
-    <button class="pause-btn" id="pauseBtn" disabled>暫停</button>
-    <button class="reset-btn" id="resetBtn" disabled>重新選擇題目</button>
-    <button class="finish-btn" id="finishBtn" disabled>結束挑戰</button>
-  </div>
-
-  <div class="action-buttons secondary">
-    <button class="record-btn" id="historyBtn">歷史成績</button>
-    <button class="record-btn" id="exportBtn">導出紀錄</button>
-    <button class="record-btn danger" id="clearBtn">清除紀錄</button>
-  </div>
-
-  <div class="grid-wrapper">
-    <div class="pause-overlay" id="pauseOverlay">⏸ 已暫停</div>
-    <table class="grid" id="grid"></table>
-  </div>
-
-  <div class="result" id="result">
-    <h2>完成!</h2>
-    <p>用時:<span id="finalTime"></span></p>
-    <p>正確:<span id="correctCount"></span> / <span id="totalCount">100</span></p>
-    <div class="slowest" id="slowestWrap">
-      <h3>📌 用時最久的 3 題（建議多複習）</h3>
-      <div id="slowestList"></div>
+  <div class="count-section">
+    <div class="count-title">NUMBER OF QUESTIONS</div>
+    <div class="count-chips">
+      <button class="count-chip" data-count="20">20</button>
+      <button class="count-chip" data-count="45">45</button>
+      <button class="count-chip" data-count="75">75</button>
+      <button class="count-chip active" data-count="100">100</button>
     </div>
   </div>
+  <div class="result-card" id="result"><h2 class="result-title" id="resultTitle">Complete ✦</h2><div class="result-stats"><div class="result-stat"><div class="result-stat-label">TIME</div><div class="result-stat-value" id="finalTime">—</div></div><div class="result-stat"><div class="result-stat-label">CORRECT</div><div class="result-stat-value"><span id="correctCount">—</span>/<span id="totalCount">100</span></div></div></div>
+    <button class="result-share-btn" id="resultShareBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share result</button>
+    <div class="slowest" id="slowestWrap"><h3>Top 3 Slowest · Review These</h3><div id="slowestList"></div></div></div>
+  <button class="start-big" id="startBtn">Start</button>
 </div>
-
-<div class="countdown-overlay" id="countdownOverlay">
-  <div class="countdown-num" id="countdownNum">3</div>
+<div class="quiz-overlay" id="quizOverlay">
+  <div class="quiz-topbar"><div class="quiz-timer" id="quizTimer">00:00.00</div><div class="quiz-progress-text" id="quizProgressText">0 / 100</div>
+    <div class="quiz-btns"><button class="quiz-btn" id="qPauseBtn" aria-label="Pause"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+      <button class="quiz-btn" id="qFinishBtn" aria-label="Finish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button></div></div>
+  <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div></div>
+  <div class="card-area"><div class="q-card" id="qCard"><div class="quiz-pause" id="quizPause"><div class="p-ico">⏸</div><div class="p-txt">Paused</div></div><div class="q-num" id="qNum">Q1 / 100</div><div id="qBody"></div></div></div>
 </div>
-
-<div class="modal-backdrop" id="historyModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h2>歷史成績與分析</h2>
-      <button class="modal-close" id="modalCloseBtn">×</button>
-    </div>
-    <div class="modal-body">
-      <h3 style="margin:0 0 8px;font-size:0.95rem;color:#7f8c8d;">各模式最佳紀錄</h3>
-      <div class="best-records" id="bestRecords"></div>
-      <h3 style="margin:0 0 8px;font-size:0.95rem;color:#7f8c8d;">所有紀錄</h3>
-      <div id="historyTableWrap"></div>
-    </div>
-  </div>
-</div>
-
+<div class="countdown-overlay" id="countdownOverlay"><div class="countdown-num" id="countdownNum">3</div></div>
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<div class="sheet" id="menuSheet" role="dialog" aria-modal="true"><div class="sheet-handle"></div><div class="sheet-header"><h3 class="sheet-title">Menu</h3><button class="sheet-close" data-close-sheet>×</button></div><div class="sheet-body"><div class="menu-list">
+  <button class="menu-item" id="menuHistory"><span class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13a9 9 0 1 0 .52-4.77L3 8"/><path d="M12 7v5l4 2"/></svg></span><div class="menu-text"><div class="menu-text-main">History</div><div class="menu-text-sub">View best times and practice log</div></div><span class="menu-arrow">›</span></button>
+  <button class="menu-item" id="menuShare"><span class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span><div class="menu-text"><div class="menu-text-main">Share Records</div><div class="menu-text-sub">Share your best times with friends</div></div><span class="menu-arrow">›</span></button>
+  <button class="menu-item" id="menuExport"><span class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span><div class="menu-text"><div class="menu-text-main">Export (TXT)</div><div class="menu-text-sub">Download full practice history</div></div><span class="menu-arrow">›</span></button>
+  <button class="menu-item" id="menuCopy"><span class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span><div class="menu-text"><div class="menu-text-main">Copy Best Times</div><div class="menu-text-sub">Copy to clipboard for messaging</div></div><span class="menu-arrow">›</span></button>
+  <button class="menu-item danger" id="menuClear"><span class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span><div class="menu-text"><div class="menu-text-main">Clear All Records</div><div class="menu-text-sub">Delete entire practice history</div></div><span class="menu-arrow">›</span></button>
+</div></div></div>
+<div class="sheet" id="modesSheet" role="dialog" aria-modal="true"><div class="sheet-handle"></div><div class="sheet-header"><h3 class="sheet-title">Choose Practice Mode</h3><button class="sheet-close" data-close-sheet>×</button></div><div class="sheet-body">
+  <div class="mode-section"><h4 class="mode-section-title">Arithmetic · 100 squares</h4><div class="mode-grid">
+    <button class="mode-card" data-mode="add"><div class="mode-name">Addition</div><div class="mode-range">0–9 + 0–9</div></button>
+    <button class="mode-card" data-mode="sub"><div class="mode-name">Subtraction</div><div class="mode-range">10–19 − 0–9</div></button>
+    <button class="mode-card" data-mode="mul"><div class="mode-name">Multiplication</div><div class="mode-range">0–9 × 0–9</div></button>
+    <button class="mode-card" data-mode="div"><div class="mode-name">Division</div><div class="mode-range">10–99 ÷ 1–9</div></button></div></div>
+  <div class="mode-section"><h4 class="mode-section-title">Times Table · 12 squares</h4><div class="mode-grid times">
+    <button class="mode-card" data-mode="mul2"><div class="mode-name">×2</div></button><button class="mode-card" data-mode="mul3"><div class="mode-name">×3</div></button><button class="mode-card" data-mode="mul4"><div class="mode-name">×4</div></button><button class="mode-card" data-mode="mul5"><div class="mode-name">×5</div></button>
+    <button class="mode-card" data-mode="mul6"><div class="mode-name">×6</div></button><button class="mode-card" data-mode="mul7"><div class="mode-name">×7</div></button><button class="mode-card" data-mode="mul8"><div class="mode-name">×8</div></button><button class="mode-card" data-mode="mul9"><div class="mode-name">×9</div></button></div></div></div></div>
+<div class="sheet" id="historySheet" role="dialog" aria-modal="true"><div class="sheet-handle"></div><div class="sheet-header"><h3 class="sheet-title">History</h3><button class="sheet-close" data-close-sheet>×</button></div><div class="sheet-body">
+  <h4 class="section-sublabel">Best Time per Mode</h4><div class="best-records" id="bestRecords"></div>
+  <h4 class="section-sublabel">All Records</h4><div class="history-list" id="historyTableWrap"></div></div></div>
+<div class="toast" id="toast"></div>
 <script>
-  let currentMode = 'add';
-  let rowHeaders = [];
-  let colHeaders = [];
-  let answers = [];      // 正確答案 [row][col]
-  let gridQuestions = null; // 單一乘法表模式用: 每格的題目 (被乘數)
-  let started = false;
-  let paused = false;
-  let startTime = 0;
-  let pauseStartTime = 0;
-  let pausedTotal = 0;   // 累積暫停時間
-  let timerInterval = null;
-  let filledCount = 0;
-  let lastAnswerTime = 0;       // 上次答對時的時間戳 (用於算每題耗時)
-  let pausedTotalAtLast = 0;    // 上次答對時, pausedTotal 的快照
-  let questionTimes = [];       // 每題耗時記錄: [{label, ms}, ...]
+let currentMode='add',rowHeaders=[],colHeaders=[],answers=[],gridQuestions=null;
+let started=false,paused=false,startTime=0,pauseStartTime=0,pausedTotal=0,timerInterval=null;
+let filledCount=0,lastAnswerTime=0,pausedTotalAtLast=0,questionTimes=[];
+let activeSheet=null,autoPausedBySheet=false;
+let questionList=[],currentQIdx=0;
+const timerEl=document.getElementById('timer'),startBtn=document.getElementById('startBtn'),resultEl=document.getElementById('result'),currentModeLabel=document.getElementById('currentModeLabel');
+const quizOverlay=document.getElementById('quizOverlay'),quizTimerEl=document.getElementById('quizTimer'),progressFill=document.getElementById('progressFill'),progressText=document.getElementById('quizProgressText');
+const qCard=document.getElementById('qCard'),qNum=document.getElementById('qNum'),qBody=document.getElementById('qBody');
+const qPauseBtn=document.getElementById('qPauseBtn'),qFinishBtn=document.getElementById('qFinishBtn'),quizPause=document.getElementById('quizPause');
+const modeNames={add:'Addition 0–9',sub:'Subtraction 10–19 − 0–9',mul:'Multiplication 0–9',div:'Division 10–99 ÷ 1–9',mul2:'×2 Table',mul3:'×3 Table',mul4:'×4 Table',mul5:'×5 Table',mul6:'×6 Table',mul7:'×7 Table',mul8:'×8 Table',mul9:'×9 Table'};
+const modeNamesShort={add:'+',sub:'−',mul:'×',div:'÷',mul2:'×2',mul3:'×3',mul4:'×4',mul5:'×5',mul6:'×6',mul7:'×7',mul8:'×8',mul9:'×9'};
+const allModes=['add','sub','mul','div','mul2','mul3','mul4','mul5','mul6','mul7','mul8','mul9'];
+let questionCount=100;
+// Home mode cards
+document.querySelectorAll('.home-mode').forEach(card=>{card.addEventListener('click',()=>{selectMode(card.dataset.mode)})});
+// Count chips
+document.querySelectorAll('.count-chip').forEach(chip=>{chip.addEventListener('click',()=>{if(started)return;questionCount=parseInt(chip.dataset.count,10);document.querySelectorAll('.count-chip').forEach(c=>c.classList.toggle('active',c===chip));document.getElementById('countLabel').textContent=questionCount})});
+function selectMode(mode){if(started)return;currentMode=mode;document.querySelectorAll('.home-mode').forEach(c=>c.classList.toggle('active',c.dataset.mode===mode));document.querySelectorAll('.mode-card').forEach(c=>c.classList.toggle('active',c.dataset.mode===mode));currentModeLabel.textContent=modeNames[mode];const isSM=mode.startsWith('mul')&&mode.length>3;document.querySelector('.count-section').style.opacity=isSM?'0.4':'1';document.querySelector('.count-section').style.pointerEvents=isSM?'none':'';document.getElementById('countLabel').textContent=isSM?'12':questionCount}
+document.querySelectorAll('.mode-card').forEach(card=>{card.addEventListener('click',()=>{selectMode(card.dataset.mode);setTimeout(()=>closeSheet(),250)})});
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function generateHeaders(mode){gridQuestions=null;if(mode==='add'){rowHeaders=shuffle([0,1,2,3,4,5,6,7,8,9]);colHeaders=shuffle([0,1,2,3,4,5,6,7,8,9])}else if(mode==='sub'){rowHeaders=shuffle([10,11,12,13,14,15,16,17,18,19]);colHeaders=shuffle([0,1,2,3,4,5,6,7,8,9])}else if(mode==='mul'){rowHeaders=shuffle([0,1,2,3,4,5,6,7,8,9]);colHeaders=shuffle([0,1,2,3,4,5,6,7,8,9])}else if(mode==='div'){const d=[1,2,3,4,5,6,7,8,9];rowHeaders=shuffle(d.concat([d[Math.floor(Math.random()*9)]]));gridQuestions=[];for(let i=0;i<10;i++){const rq=[],u=new Set();while(rq.length<10){const v=10+Math.floor(Math.random()*90);if(!u.has(v)){u.add(v);rq.push(v)}}gridQuestions.push(rq)}colHeaders=[]}else if(mode.startsWith('mul')&&mode.length>3){const N=parseInt(mode.slice(3),10);const sh=shuffle([1,2,3,4,5,6,7,8,9,10,11,12]);gridQuestions=[sh];rowHeaders=[N];colHeaders=sh.slice()}}
+function computeAnswers(mode){answers=[];if(mode.startsWith('mul')&&mode.length>3){const N=parseInt(mode.slice(3),10);const r=[];for(let j=0;j<12;j++)r.push(N*gridQuestions[0][j]);answers.push(r);return}for(let i=0;i<10;i++){const r=[];for(let j=0;j<10;j++){const rv=rowHeaders[i],cv=colHeaders[j];let a;if(mode==='add')a=rv+cv;else if(mode==='sub')a=rv-cv;else if(mode==='mul')a=rv*cv;else if(mode==='div'){const dv=gridQuestions[i][j];a={q:Math.floor(dv/rv),r:dv%rv}}r.push(a)}answers.push(r)}}
+function opSymbol(mode){if(mode.startsWith('mul')&&mode.length>3)return'×';return{add:'+',sub:'−',mul:'×',div:'÷'}[mode]}
+function questionLabel(mode,row,col){if(mode==='add')return rowHeaders[row]+'+'+colHeaders[col];if(mode==='sub')return rowHeaders[row]+'−'+colHeaders[col];if(mode==='mul')return rowHeaders[row]+'×'+colHeaders[col];if(mode==='div')return gridQuestions[row][col]+'÷'+rowHeaders[row];if(mode.startsWith('mul')&&mode.length>3)return parseInt(mode.slice(3),10)+'×'+gridQuestions[0][col];return''}
+function buildQuestionList(mode){questionList=[];const isSM=mode.startsWith('mul')&&mode.length>3;if(isSM){const N=parseInt(mode.slice(3),10);for(let j=0;j<12;j++)questionList.push({row:0,col:j,a:gridQuestions[0][j],b:N,label:questionLabel(mode,0,j),answer:answers[0][j],isDiv:false})}else if(mode==='div'){for(let i=0;i<10;i++)for(let j=0;j<10;j++){const dv=gridQuestions[i][j],ds=rowHeaders[i];questionList.push({row:i,col:j,dividend:dv,divisor:ds,label:questionLabel(mode,i,j),answer:answers[i][j],isDiv:true})}}else{for(let i=0;i<10;i++)for(let j=0;j<10;j++)questionList.push({row:i,col:j,a:rowHeaders[i],b:colHeaders[j],label:questionLabel(mode,i,j),answer:answers[i][j],isDiv:false})}
+if(!isSM&&questionList.length>questionCount){questionList=shuffle(questionList).slice(0,questionCount)}}
+function formatTime(ms){const tc=Math.floor(ms/10),cs=tc%100,ts=Math.floor(tc/100),s=ts%60,m=Math.floor(ts/60);return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+String(cs).padStart(2,'0')}
+function startTimer(){startTime=performance.now();pausedTotal=0;timerEl.classList.add('running');quizTimerEl.classList.remove('paused-color');timerInterval=setInterval(()=>{if(!paused){const t=formatTime(performance.now()-startTime-pausedTotal);timerEl.textContent=t;quizTimerEl.textContent=t}},33)}
+function stopTimer(){clearInterval(timerInterval);timerEl.classList.remove('running','paused-color');quizTimerEl.classList.remove('paused-color');const e=performance.now()-startTime-pausedTotal;const t=formatTime(e);timerEl.textContent=t;quizTimerEl.textContent=t;return e}
+function togglePause(){if(!started)return;if(!paused){paused=true;pauseStartTime=performance.now();quizPause.classList.add('show');qPauseBtn.classList.add('paused-state');qPauseBtn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg>';timerEl.classList.remove('running');timerEl.classList.add('paused-color');quizTimerEl.classList.add('paused-color');if(document.activeElement)document.activeElement.blur()}else{paused=false;pausedTotal+=performance.now()-pauseStartTime;quizPause.classList.remove('show');qPauseBtn.classList.remove('paused-state');qPauseBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';timerEl.classList.add('running');timerEl.classList.remove('paused-color');quizTimerEl.classList.remove('paused-color');focusCur()}}
+function focusCur(){const inp=qBody.querySelector('.q-input:not(.correct),.div-input:not(.done)');if(inp)setTimeout(()=>inp.focus(),50)}
+function showQuestion(idx){const q=questionList[idx],total=questionList.length;qNum.textContent='Q'+(idx+1)+' / '+total;progressText.textContent=filledCount+' / '+total;progressFill.style.width=(filledCount/total*100)+'%';qBody.innerHTML='';
+if(q.isDiv){const p=document.createElement('div');p.className='div-problem';p.innerHTML='<span>'+q.dividend+'</span> <span class="q-op">÷</span> <span>'+q.divisor+'</span> <span class="q-op">=</span> <span class="q-op">?</span>';qBody.appendChild(p);
+const row=document.createElement('div');row.className='div-inputs-row';
+const gQ=document.createElement('div');gQ.className='div-input-group';const lQ=document.createElement('div');lQ.className='div-label';lQ.textContent='Quotient';const iQ=document.createElement('input');iQ.className='div-input';iQ.type='text';iQ.inputMode='numeric';iQ.pattern='[0-9]*';iQ.autocomplete='off';iQ.dataset.part='q';gQ.appendChild(lQ);gQ.appendChild(iQ);
+const gR=document.createElement('div');gR.className='div-input-group';const lR=document.createElement('div');lR.className='div-label';lR.textContent='Remainder';const iR=document.createElement('input');iR.className='div-input';iR.type='text';iR.inputMode='numeric';iR.pattern='[0-9]*';iR.autocomplete='off';iR.dataset.part='r';gR.appendChild(lR);gR.appendChild(iR);
+row.appendChild(gQ);row.appendChild(gR);qBody.appendChild(row);iQ.addEventListener('input',onDivInput);iR.addEventListener('input',onDivInput);setTimeout(()=>iQ.focus(),100)}
+else{const sym=opSymbol(currentMode);const isSM=currentMode.startsWith('mul')&&currentMode.length>3;const a=isSM?q.b:q.a,b=isSM?q.a:q.b;
+const p=document.createElement('div');p.className='q-problem';p.innerHTML='<span>'+a+'</span><span class="q-op">'+sym+'</span><span>'+b+'</span><span class="q-eq">=</span>';qBody.appendChild(p);
+const w=document.createElement('div');w.className='q-input-wrap';const inp=document.createElement('input');inp.className='q-input';inp.type='text';inp.inputMode='numeric';inp.pattern='[0-9]*';inp.autocomplete='off';inp.addEventListener('input',onStdInput);w.appendChild(inp);qBody.appendChild(w);setTimeout(()=>inp.focus(),100)}}
+function onStdInput(e){const inp=e.target;inp.value=inp.value.replace(/[^0-9\-]/g,'');const val=inp.value.trim();if(val==='')return;const q=questionList[currentQIdx],expected=q.answer,num=parseInt(val,10);
+if(num===expected){inp.classList.add('correct');inp.disabled=true;qCard.classList.remove('wrong-shake');qCard.classList.add('correct-flash');recordDone();setTimeout(()=>{qCard.classList.remove('correct-flash');advanceNext()},400)}
+else if(val.length>=String(expected).length){inp.classList.add('wrong');qCard.classList.add('wrong-shake');setTimeout(()=>{inp.classList.remove('wrong');qCard.classList.remove('wrong-shake');inp.value='';inp.focus()},400)}}
+function onDivInput(e){const inp=e.target;inp.value=inp.value.replace(/[^0-9]/g,'');const val=inp.value.trim();if(val==='')return;const q=questionList[currentQIdx],part=inp.dataset.part,expected=part==='q'?q.answer.q:q.answer.r,num=parseInt(val,10);
+if(num===expected){inp.classList.add('done');inp.disabled=true;const all=qBody.querySelectorAll('.div-input');if(Array.from(all).every(i=>i.classList.contains('done'))){qCard.classList.add('correct-flash');recordDone();setTimeout(()=>{qCard.classList.remove('correct-flash');advanceNext()},400)}else{const oth=qBody.querySelector('.div-input:not(.done)');if(oth)oth.focus()}}
+else if(val.length>=String(expected).length){inp.classList.add('wrong');qCard.classList.add('wrong-shake');setTimeout(()=>{inp.classList.remove('wrong');qCard.classList.remove('wrong-shake');inp.value='';inp.focus()},400)}}
+function recordDone(){const now=performance.now(),elapsed=(now-lastAnswerTime)-(pausedTotal-pausedTotalAtLast);const q=questionList[currentQIdx],ansD=q.isDiv?(q.answer.r===0?q.answer.q:(q.answer.q+'...'+q.answer.r)):q.answer;questionTimes.push({label:q.label,answer:ansD,ms:elapsed});lastAnswerTime=now;pausedTotalAtLast=pausedTotal;filledCount++;const total=questionList.length;progressText.textContent=filledCount+' / '+total;progressFill.style.width=(filledCount/total*100)+'%'}
+function advanceNext(){currentQIdx++;if(currentQIdx>=questionList.length)finish(false);else showQuestion(currentQIdx)}
+function startChallenge(){generateHeaders(currentMode);computeAnswers(currentMode);buildQuestionList(currentMode);currentQIdx=0;filledCount=0;paused=false;pausedTotal=0;questionTimes=[];quizPause.classList.remove('show');qPauseBtn.classList.remove('paused-state');qPauseBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';resultEl.classList.remove('show');quizOverlay.classList.add('show');showQuestion(0);started=true;startBtn.textContent='Restart';document.querySelectorAll('.home-mode,.count-chip').forEach(c=>c.style.pointerEvents='none');startTimer();lastAnswerTime=startTime;pausedTotalAtLast=0}
+function finish(early){const elapsed=stopTimer();const total=questionList.length,done=filledCount;try{saveRecord({mode:currentMode,timeMs:elapsed,timestamp:Date.now(),paused:pausedTotal>0,early:!!early,done,total})}catch(e){}started=false;paused=false;quizOverlay.classList.remove('show');document.querySelectorAll('.home-mode,.count-chip').forEach(c=>c.style.pointerEvents='');
+resultEl.classList.toggle('early',!!early);document.getElementById('resultTitle').textContent=early?'Stopped Early':'Complete ✦';document.getElementById('finalTime').textContent=formatTime(elapsed);document.getElementById('correctCount').textContent=done;document.getElementById('totalCount').textContent=total;
+const sl=document.getElementById('slowestList');sl.innerHTML='';const top3=questionTimes.slice().sort((a,b)=>b.ms-a.ms).slice(0,3);if(!top3.length)sl.innerHTML='<div style="color:var(--ink-600);text-align:center;padding:8px;font-size:.85rem">No answered questions</div>';else top3.forEach((q,i)=>{const r=document.createElement('div');r.className='slow-row';r.innerHTML='<span><span class="rank r'+(i+1)+'">'+(i+1)+'</span><span class="qtext">'+q.label+' = '+q.answer+'</span></span><span class="qtime">'+(q.ms/1000).toFixed(2)+'s</span>';sl.appendChild(r)});
+resultEl.classList.add('show');startBtn.textContent='Start';setTimeout(()=>resultEl.scrollIntoView({behavior:'smooth',block:'start'}),100)}
+startBtn.addEventListener('click',()=>{if(timerInterval)clearInterval(timerInterval);timerEl.textContent='00:00.00';resultEl.classList.remove('show');runCountdownThenStart()});
+function runCountdownThenStart(){startBtn.disabled=true;document.querySelectorAll('.home-mode,.count-chip').forEach(b=>b.style.pointerEvents='none');const ov=document.getElementById('countdownOverlay'),num=document.getElementById('countdownNum');ov.classList.add('show');const seq=['3','2','1','GO!'];let idx=0;function step(){num.classList.remove('go');num.style.animation='none';void num.offsetWidth;num.style.animation='';num.textContent=seq[idx];if(seq[idx]==='GO!')num.classList.add('go');idx++;if(idx<seq.length)setTimeout(step,800);else setTimeout(()=>{ov.classList.remove('show');startBtn.disabled=false;startChallenge()},600)}step()}
+qPauseBtn.addEventListener('click',togglePause);
+qFinishBtn.addEventListener('click',()=>{if(!started)return;if(paused){paused=false;pausedTotal+=performance.now()-pauseStartTime;quizPause.classList.remove('show')}if(!confirm('End this challenge?\n'+filledCount+' answered question(s) will be saved.'))return;finish(true)});
+const STORAGE_KEY='math100_records_v1';
+function loadRecords(){try{const r=localStorage.getItem(STORAGE_KEY);if(!r)return[];const a=JSON.parse(r);return Array.isArray(a)?a:[]}catch(e){return[]}}
+function saveRecord(rec){const a=loadRecords();a.push(rec);try{localStorage.setItem(STORAGE_KEY,JSON.stringify(a))}catch(e){}}
+function formatDate(ts){const d=new Date(ts),p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())}
+function renderHistory(){const records=loadRecords();const bw=document.getElementById('bestRecords');bw.innerHTML='';const best={};records.forEach(r=>{if(r.paused||r.early)return;if(!best[r.mode]||r.timeMs<best[r.mode].timeMs)best[r.mode]=r});allModes.forEach(m=>{const d=document.createElement('div');d.className='best-record';const b=best[m];if(!b)d.classList.add('empty');d.innerHTML='<div class="mode-name">'+modeNames[m]+'</div><div class="best-time">'+(b?formatTime(b.timeMs):'— — —')+'</div>';bw.appendChild(d)});const tw=document.getElementById('historyTableWrap');tw.innerHTML='';if(!records.length){tw.innerHTML='<div class="history-empty">No records yet</div>';return}records.slice().sort((a,b)=>b.timestamp-a.timestamp).forEach(r=>{const d=document.createElement('div');d.className='history-row';const pr=(r.done!==undefined&&r.total!==undefined)?(r.done+'/'+r.total):'Done';const tg=[];if(r.paused)tg.push('<span class="tag paused">Paused</span>');if(r.early)tg.push('<span class="tag early">Early</span>');tg.push('<span class="tag progress">'+pr+'</span>');d.innerHTML='<div class="h-date">'+formatDate(r.timestamp)+'</div><div class="h-time">'+formatTime(r.timeMs)+'</div><div class="h-mode">'+(modeNames[r.mode]||r.mode)+'</div><div class="h-tags">'+tg.join('')+'</div>';tw.appendChild(d)})}
+function padEndCJK(s,w){let l=0;for(const c of s)l+=/[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/.test(c)?2:1;return s+' '.repeat(Math.max(0,w-l))}
+function buildExportText(){const r=loadRecords(),s=r.slice().sort((a,b)=>b.timestamp-a.timestamp),best={};r.forEach(x=>{if(x.paused||x.early)return;if(!best[x.mode]||x.timeMs<best[x.mode].timeMs)best[x.mode]=x});const l=['===== Hundred-Square Math =====','Exported: '+formatDate(Date.now()),'Total: '+r.length,'','--- Best ---'];allModes.forEach(m=>{l.push(padEndCJK(modeNames[m]||m,22)+(best[m]?formatTime(best[m].timeMs):'—'))});l.push('','--- All ---');s.forEach(x=>{l.push(formatDate(x.timestamp).padEnd(18)+padEndCJK(modeNames[x.mode]||x.mode,22)+formatTime(x.timeMs).padEnd(13)+((x.done!==undefined?x.done+'/'+x.total:'Done').padEnd(8))+(x.paused?'P':' ')+(x.early?'E':''))});return l.join('\n')}
+function exportTXT(){const r=loadRecords();if(!r.length){showToast('No records');return}const t=buildExportText();const b=new Blob(['\uFEFF'+t],{type:'text/plain;charset=utf-8'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='math100_'+new Date().toISOString().slice(0,10)+'.txt';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);showToast('TXT downloaded')}
+function buildShareText(kind){if(kind==='result')return'\u{1f4d0} Hundred-Square Math \u00b7 '+modeNames[currentMode]+'\n\u23f1 '+document.getElementById('finalTime').textContent+'\n\u2705 '+document.getElementById('correctCount').textContent+'/'+document.getElementById('totalCount').textContent+'\n\nCan you beat my time?';const r=loadRecords(),best={};r.forEach(x=>{if(x.paused||x.early)return;if(!best[x.mode]||x.timeMs<best[x.mode].timeMs)best[x.mode]=x});if(!Object.keys(best).length)return null;const l=['\u{1f4d0} Hundred-Square Math \u00b7 My Best',''];allModes.forEach(m=>{const b=best[m];if(b)l.push('\u30fb'+modeNames[m]+': '+formatTime(b.timeMs))});return l.join('\n')}
+async function doShare(t,title){if(navigator.share){try{await navigator.share({title,text:t});return}catch(e){if(e&&e.name==='AbortError')return}}await copyToClipboard(t)}
+async function copyToClipboard(t){try{if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(t);else{const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a)}showToast('Copied to clipboard')}catch(e){showToast('Copy failed')}}
+async function shareResult(){await doShare(buildShareText('result'),'Hundred-Square Math')}
+async function shareBest(){const t=buildShareText('best');if(!t){showToast('No records yet');return}await doShare(t,'Hundred-Square Math')}
+async function copyBest(){const t=buildShareText('best');if(!t){showToast('No records yet');return}await copyToClipboard(t)}
+function clearAllRecords(){if(!confirm('Clear all records?\nThis cannot be undone.'))return;localStorage.removeItem(STORAGE_KEY);renderHistory();showToast('All records cleared')}
+const sheetBackdrop=document.getElementById('sheetBackdrop'),menuSheet=document.getElementById('menuSheet'),modesSheet=document.getElementById('modesSheet'),historySheet=document.getElementById('historySheet');
+function openSheet(sheet){closeSheet(true);if(started&&!paused){togglePause();autoPausedBySheet=true}sheet.classList.add('show');sheetBackdrop.classList.add('show');activeSheet=sheet;document.body.style.overflow='hidden'}
+function closeSheet(skip){[menuSheet,modesSheet,historySheet].forEach(s=>s.classList.remove('show'));if(!skip)sheetBackdrop.classList.remove('show');activeSheet=null;document.body.style.overflow='';if(!skip&&autoPausedBySheet&&started&&paused){togglePause();autoPausedBySheet=false}}
+sheetBackdrop.addEventListener('click',()=>closeSheet());
+document.querySelectorAll('[data-close-sheet]').forEach(b=>b.addEventListener('click',()=>closeSheet()));
+[menuSheet,modesSheet,historySheet].forEach(sheet=>{const h=sheet.querySelector('.sheet-handle'),hd=sheet.querySelector('.sheet-header');let sy=null,cy=null;const onS=e=>{sy=(e.touches?e.touches[0].clientY:e.clientY);cy=sy;sheet.style.transition='none'};const onM=e=>{if(sy===null)return;cy=(e.touches?e.touches[0].clientY:e.clientY);sheet.style.transform='translateY('+Math.max(0,cy-sy)+'px)'};const onE=()=>{if(sy===null)return;sheet.style.transition='';if(cy-sy>80){sheet.style.transform='';closeSheet()}else sheet.style.transform='';sy=null;cy=null};[h,hd].forEach(el=>{el.addEventListener('touchstart',onS,{passive:true});el.addEventListener('touchmove',onM,{passive:true});el.addEventListener('touchend',onE)})});
+document.getElementById('menuBtn').addEventListener('click',()=>openSheet(menuSheet));
 
-  const timerEl = document.getElementById('timer');
-  const gridEl = document.getElementById('grid');
-  const startBtn = document.getElementById('startBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const finishBtn = document.getElementById('finishBtn');
-  const pauseOverlay = document.getElementById('pauseOverlay');
-  const resultEl = document.getElementById('result');
-
-  // --- 產生題目 ---
-  function shuffle(arr) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  function generateHeaders(mode) {
-    if (mode === 'add') {
-      // row: 0-9, col: 0-9, 答案 = row + col
-      rowHeaders = shuffle([0,1,2,3,4,5,6,7,8,9]);
-      colHeaders = shuffle([0,1,2,3,4,5,6,7,8,9]);
-    } else if (mode === 'sub') {
-      // row: 10-19 (被減數), col: 0-9 (減數)
-      rowHeaders = shuffle([10,11,12,13,14,15,16,17,18,19]);
-      colHeaders = shuffle([0,1,2,3,4,5,6,7,8,9]);
-    } else if (mode === 'mul') {
-      rowHeaders = shuffle([0,1,2,3,4,5,6,7,8,9]);
-      colHeaders = shuffle([0,1,2,3,4,5,6,7,8,9]);
-    } else if (mode === 'div') {
-      // 每列一個除數 (1~9 選 10 個可重複), 每列獨立 10 個被除數 (10~99 隨機)
-      const divisors = [1,2,3,4,5,6,7,8,9];
-      rowHeaders = shuffle(divisors.concat([divisors[Math.floor(Math.random()*9)]]));
-      // gridQuestions[i][j] = 該列該欄的被除數
-      gridQuestions = [];
-      for (let i = 0; i < 10; i++) {
-        const rowQ = [];
-        const used = new Set();
-        while (rowQ.length < 10) {
-          const d = 10 + Math.floor(Math.random() * 90); // 10-99
-          if (!used.has(d)) { used.add(d); rowQ.push(d); }
-        }
-        gridQuestions.push(rowQ);
-      }
-      colHeaders = []; // 除法模式沒有共用欄標題
-    } else if (mode.startsWith('mul') && mode.length > 3) {
-      // 單一乘法表: mul2, mul3, ..., mul9
-      // 規則: 12 格橫列, 被乘數 1~12 打亂呈現
-      const N = parseInt(mode.slice(3), 10);
-      const shuffled = shuffle([1,2,3,4,5,6,7,8,9,10,11,12]);
-      // gridQuestions 存成一列 12 格
-      gridQuestions = [shuffled];
-      rowHeaders = [N];
-      colHeaders = shuffled.slice();
-    }
-  }
-
-  function computeAnswers(mode) {
-    answers = [];
-    if (mode.startsWith('mul') && mode.length > 3) {
-      const N = parseInt(mode.slice(3), 10);
-      // 單一乘法表只有一列 12 格
-      const row = [];
-      for (let j = 0; j < 12; j++) {
-        row.push(N * gridQuestions[0][j]);
-      }
-      answers.push(row);
-      return;
-    }
-    for (let i = 0; i < 10; i++) {
-      const row = [];
-      for (let j = 0; j < 10; j++) {
-        const r = rowHeaders[i], c = colHeaders[j];
-        let ans;
-        if (mode === 'add') ans = r + c;
-        else if (mode === 'sub') ans = r - c;
-        else if (mode === 'mul') ans = r * c;
-        else if (mode === 'div') {
-          // 被除數在 gridQuestions[i][j], 除數是 rowHeaders[i]
-          const dividend = gridQuestions[i][j];
-          const divisor = rowHeaders[i];
-          ans = { q: Math.floor(dividend / divisor), r: dividend % divisor };
-        }
-        row.push(ans);
-      }
-      answers.push(row);
-    }
-  }
-
-  function buildGrid(mode) {
-    gridEl.innerHTML = '';
-    const isSingleMul = mode.startsWith('mul') && mode.length > 3;
-    const singleMulN = isSingleMul ? parseInt(mode.slice(3), 10) : null;
-    gridEl.classList.toggle('single-mul', isSingleMul);
-
-    // --- 單一乘法表: 12 格橫列 ---
-    if (isSingleMul) {
-      // 第一列: "×N" 標籤 + 12 個被乘數數字
-      const headerRow = document.createElement('tr');
-      const corner = document.createElement('td');
-      corner.className = 'header';
-      corner.textContent = '×' + singleMulN;
-      headerRow.appendChild(corner);
-      for (let j = 0; j < 12; j++) {
-        const th = document.createElement('td');
-        th.className = 'question';
-        th.textContent = gridQuestions[0][j];
-        headerRow.appendChild(th);
-      }
-      gridEl.appendChild(headerRow);
-
-      // 第二列: 左邊空白 + 12 個輸入格
-      const answerRow = document.createElement('tr');
-      const labelTd = document.createElement('td');
-      labelTd.className = 'question';
-      labelTd.textContent = '答';
-      answerRow.appendChild(labelTd);
-      for (let j = 0; j < 12; j++) {
-        const td = document.createElement('td');
-        td.className = 'cell';
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.inputMode = 'numeric';
-        input.dataset.row = 0;
-        input.dataset.col = j;
-        input.disabled = true;
-        input.addEventListener('input', onCellInput);
-        td.appendChild(input);
-        answerRow.appendChild(td);
-      }
-      gridEl.appendChild(answerRow);
-      return;
-    }
-
-    // --- 除法模式: 獨立版面 (每列獨立被除數, 每格填商+餘) ---
-    if (mode === 'div') {
-      // 表頭只顯示一個「÷」角標, 沒有共用欄標題
-      const headerRow = document.createElement('tr');
-      const corner = document.createElement('td');
-      corner.className = 'header';
-      corner.textContent = '÷';
-      corner.colSpan = 11;
-      corner.style.textAlign = 'center';
-      headerRow.appendChild(corner);
-      gridEl.appendChild(headerRow);
-
-      for (let i = 0; i < 10; i++) {
-        const tr = document.createElement('tr');
-        const rh = document.createElement('td');
-        rh.className = 'question';
-        rh.textContent = '÷' + rowHeaders[i];
-        tr.appendChild(rh);
-
-        for (let j = 0; j < 10; j++) {
-          const td = document.createElement('td');
-          td.className = 'cell div-cell';
-          // 被除數 (大字)
-          const dividend = document.createElement('div');
-          dividend.className = 'div-dividend';
-          dividend.textContent = gridQuestions[i][j];
-          td.appendChild(dividend);
-          // 兩個 input: 商、餘
-          const inputWrap = document.createElement('div');
-          inputWrap.className = 'div-inputs';
-          const qInput = document.createElement('input');
-          qInput.type = 'text';
-          qInput.inputMode = 'numeric';
-          qInput.dataset.row = i;
-          qInput.dataset.col = j;
-          qInput.dataset.part = 'q';
-          qInput.placeholder = '商';
-          qInput.disabled = true;
-          qInput.addEventListener('input', onCellInput);
-          const rInput = document.createElement('input');
-          rInput.type = 'text';
-          rInput.inputMode = 'numeric';
-          rInput.dataset.row = i;
-          rInput.dataset.col = j;
-          rInput.dataset.part = 'r';
-          rInput.placeholder = '餘';
-          rInput.disabled = true;
-          rInput.addEventListener('input', onCellInput);
-          inputWrap.appendChild(qInput);
-          inputWrap.appendChild(rInput);
-          td.appendChild(inputWrap);
-          tr.appendChild(td);
-        }
-        gridEl.appendChild(tr);
-      }
-      return;
-    }
-
-    // --- 標準 100 格模式 (加/減/乘) ---
-    // 第一列: 左上角空格 + 欄標題
-    const headerRow = document.createElement('tr');
-    const corner = document.createElement('td');
-    corner.className = 'header';
-    corner.textContent = opSymbol(mode);
-    headerRow.appendChild(corner);
-    for (let j = 0; j < 10; j++) {
-      const th = document.createElement('td');
-      th.className = 'question';
-      th.textContent = colHeaders[j];
-      headerRow.appendChild(th);
-    }
-    gridEl.appendChild(headerRow);
-
-    // 每列: 列標題 + 10 個輸入格
-    for (let i = 0; i < 10; i++) {
-      const tr = document.createElement('tr');
-      const rh = document.createElement('td');
-      rh.className = 'question';
-      rh.textContent = rowHeaders[i];
-      tr.appendChild(rh);
-
-      for (let j = 0; j < 10; j++) {
-        const td = document.createElement('td');
-        td.className = 'cell';
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.inputMode = 'numeric';
-        input.dataset.row = i;
-        input.dataset.col = j;
-        input.disabled = true;
-        input.addEventListener('input', onCellInput);
-        td.appendChild(input);
-        tr.appendChild(td);
-      }
-      gridEl.appendChild(tr);
-    }
-  }
-
-  function opSymbol(mode) {
-    if (mode.startsWith('mul') && mode.length > 3) return '×';
-    return { add: '+', sub: '-', mul: '×', div: '÷' }[mode];
-  }
-
-  // 依照模式與格子位置, 產生題目文字 (例: "7+8", "24÷6", "8×3")
-  function questionLabel(mode, row, col) {
-    if (mode === 'add') return rowHeaders[row] + '+' + colHeaders[col];
-    if (mode === 'sub') return rowHeaders[row] + '-' + colHeaders[col];
-    if (mode === 'mul') return rowHeaders[row] + '×' + colHeaders[col];
-    if (mode === 'div') return gridQuestions[row][col] + '÷' + rowHeaders[row];
-    if (mode.startsWith('mul') && mode.length > 3) {
-      const N = parseInt(mode.slice(3), 10);
-      return N + '×' + gridQuestions[0][col];
-    }
-    return '';
-  }
-
-  // --- 計時器 ---
-  function formatTime(ms) {
-    const totalCs = Math.floor(ms / 10);
-    const cs = totalCs % 100;
-    const totalSec = Math.floor(totalCs / 100);
-    const sec = totalSec % 60;
-    const min = Math.floor(totalSec / 60);
-    return String(min).padStart(2,'0') + ':' + String(sec).padStart(2,'0') + '.' + String(cs).padStart(2,'0');
-  }
-
-  function startTimer() {
-    startTime = performance.now();
-    pausedTotal = 0;
-    timerInterval = setInterval(() => {
-      if (!paused) {
-        timerEl.textContent = formatTime(performance.now() - startTime - pausedTotal);
-      }
-    }, 33);
-  }
-
-  function stopTimer() {
-    clearInterval(timerInterval);
-    const elapsed = performance.now() - startTime - pausedTotal;
-    timerEl.textContent = formatTime(elapsed);
-    return elapsed;
-  }
-
-  function togglePause() {
-    if (!started) return;
-    if (!paused) {
-      // 進入暫停
-      paused = true;
-      pauseStartTime = performance.now();
-      pauseOverlay.classList.add('show');
-      pauseBtn.textContent = '繼續';
-      pauseBtn.classList.add('paused');
-      // 停用所有輸入
-      gridEl.querySelectorAll('input').forEach(inp => {
-        if (!inp.classList.contains('correct')) inp.disabled = true;
-      });
-    } else {
-      // 解除暫停
-      paused = false;
-      pausedTotal += performance.now() - pauseStartTime;
-      pauseOverlay.classList.remove('show');
-      pauseBtn.textContent = '暫停';
-      pauseBtn.classList.remove('paused');
-      // 重新啟用未答對的輸入
-      gridEl.querySelectorAll('input').forEach(inp => {
-        if (!inp.classList.contains('correct')) inp.disabled = false;
-      });
-      // 焦點回到第一個未填的格子
-      const firstEmpty = Array.from(gridEl.querySelectorAll('input')).find(inp => !inp.disabled);
-      if (firstEmpty) firstEmpty.focus();
-    }
-  }
-
-  // --- 輸入處理 ---
-  function onCellInput(e) {
-    const input = e.target;
-    const row = +input.dataset.row;
-    const col = +input.dataset.col;
-    const part = input.dataset.part; // 'q' 或 'r' (僅除法), 其他模式為 undefined
-    const val = input.value.trim();
-    if (val === '') {
-      input.classList.remove('correct', 'wrong');
-      return;
-    }
-    const expected = answers[row][col];
-    const isDiv = currentMode === 'div';
-    const expectedVal = isDiv ? expected[part] : expected;
-    const inputNum = parseInt(val, 10);
-
-    if (inputNum === expectedVal) {
-      if (!input.classList.contains('correct')) {
-        input.classList.remove('wrong');
-        input.classList.add('correct');
-        input.disabled = true;
-        // 除法: 保留答對的商/餘數字 (方便使用者在同格算另一格時參考)
-        // 其他模式: 答對立刻隱藏, 防止後續偷瞄
-        if (!isDiv) {
-          input.value = '✓';
-        }
-        // 除法: 商+餘都對才算「完成一格」並計時; 否則跳到同格的另一個輸入
-        if (isDiv) {
-          const cellTd = input.closest('td');
-          const otherInput = cellTd.querySelector(
-            'input[data-part="' + (part === 'q' ? 'r' : 'q') + '"]'
-          );
-          if (otherInput && otherInput.classList.contains('correct')) {
-            // 同格兩個都對了 → 整格完成, 把兩個 input 都藏成 ✓ 防止偷瞄
-            cellTd.querySelectorAll('input').forEach(i => { i.value = '✓'; });
-            recordCellDone(row, col);
-            moveToNext(row, col);
-          } else {
-            // 跳到同格的另一個輸入 (保留商/餘數字可見, 方便算另一欄)
-            if (otherInput) otherInput.focus();
-          }
-        } else {
-          recordCellDone(row, col);
-          moveToNext(row, col);
-        }
-      }
-    } else {
-      // 只有當輸入位數達到預期才判錯, 否則等使用者繼續打
-      if (val.length >= String(expectedVal).length) {
-        input.classList.add('wrong');
-        setTimeout(() => {
-          input.classList.remove('wrong');
-          input.value = '';
-          input.focus();
-        }, 400);
-      }
-    }
-  }
-
-  // 完成一格的記錄 (計時、filledCount++、檢查完成)
-  function recordCellDone(row, col) {
-    const now = performance.now();
-    const qElapsed = (now - lastAnswerTime) - (pausedTotal - pausedTotalAtLast);
-    const expected = answers[row][col];
-    const ansDisplay = (currentMode === 'div')
-      ? (expected.r === 0 ? expected.q : (expected.q + '...' + expected.r))
-      : expected;
-    questionTimes.push({
-      label: questionLabel(currentMode, row, col),
-      answer: ansDisplay,
-      ms: qElapsed
-    });
-    lastAnswerTime = now;
-    pausedTotalAtLast = pausedTotal;
-    filledCount++;
-    const total = (currentMode.startsWith('mul') && currentMode.length > 3) ? 12 : 100;
-    if (filledCount >= total) finish();
-  }
-
-  function moveToNext(row, col) {
-    // 下一個未填的格: 先同列往右, 再下一列從頭
-    const inputs = gridEl.querySelectorAll('input');
-    for (let i = 0; i < inputs.length; i++) {
-      const r = +inputs[i].dataset.row;
-      const c = +inputs[i].dataset.col;
-      if (!inputs[i].disabled && !(r === row && c === col)) {
-        // 優先: 當前位置之後
-        if (r > row || (r === row && c > col)) {
-          inputs[i].focus();
-          return;
-        }
-      }
-    }
-    // 找不到右下方的, 從頭找第一個未填
-    for (let i = 0; i < inputs.length; i++) {
-      if (!inputs[i].disabled) {
-        inputs[i].focus();
-        return;
-      }
-    }
-  }
-
-  // --- 開始與結束 ---
-  function start(skipRebuild) {
-    if (!skipRebuild) {
-      generateHeaders(currentMode);
-      computeAnswers(currentMode);
-      buildGrid(currentMode);
-    }
-    filledCount = 0;
-    paused = false;
-    pausedTotal = 0;
-    pauseOverlay.classList.remove('show');
-    pauseBtn.textContent = '暫停';
-    pauseBtn.classList.remove('paused');
-    pauseBtn.disabled = false;
-    resetBtn.disabled = false;
-    finishBtn.disabled = false;
-    resultEl.classList.remove('show');
-
-    // 啟用所有輸入
-    const inputs = gridEl.querySelectorAll('input');
-    inputs.forEach(inp => {
-      inp.disabled = false;
-      inp.value = '';
-      inp.classList.remove('correct', 'wrong');
-    });
-    if (inputs.length > 0) inputs[0].focus();
-
-    started = true;
-    startBtn.textContent = '重新開始';
-    startTimer();
-    lastAnswerTime = startTime;
-    pausedTotalAtLast = 0;
-    questionTimes = [];
-  }
-
-  function finish(early) {
-    const elapsed = stopTimer();
-    const hadPause = pausedTotal > 0;
-    const total = (currentMode.startsWith('mul') && currentMode.length > 3) ? 12 : 100;
-    const done = filledCount; // 已完成題數
-    // 儲存到 localStorage
-    try {
-      saveRecord({
-        mode: currentMode,
-        timeMs: elapsed,
-        timestamp: Date.now(),
-        paused: hadPause,
-        early: !!early,
-        done: done,
-        total: total
-      });
-    } catch (e) { /* 忽略存檔失敗, 不影響遊戲 */ }
-    started = false;
-    paused = false;
-    pauseBtn.disabled = true;
-    pauseBtn.textContent = '暫停';
-    pauseBtn.classList.remove('paused');
-    resetBtn.disabled = true;
-    finishBtn.disabled = true;
-    // 還原所有答案 (作答中是 ✓, 結束後顯示正確答案供檢視)
-    gridEl.querySelectorAll('input').forEach(inp => {
-      const r = +inp.dataset.row;
-      const c = +inp.dataset.col;
-      const part = inp.dataset.part;
-      if (answers[r] && answers[r][c] !== undefined) {
-        const ans = answers[r][c];
-        if (part === 'q') inp.value = ans.q;
-        else if (part === 'r') inp.value = ans.r;
-        else inp.value = ans;
-      }
-    });
-    // 結果文字
-    const resultTitle = document.querySelector('.result h2');
-    if (resultTitle) resultTitle.textContent = early ? '提早結束' : '完成!';
-    document.getElementById('finalTime').textContent = ' ' + formatTime(elapsed);
-    document.getElementById('correctCount').textContent = ' ' + done;
-    document.getElementById('totalCount').textContent = total;
-
-    // 最久的 3 題 (只取已完成的)
-    const slowestList = document.getElementById('slowestList');
-    slowestList.innerHTML = '';
-    const top3 = questionTimes.slice().sort((a,b) => b.ms - a.ms).slice(0, 3);
-    if (top3.length === 0) {
-      slowestList.innerHTML = '<div style="color:#95a5a6;text-align:center;padding:8px;">沒有完成的題目</div>';
-    } else {
-      top3.forEach((q, idx) => {
-        const row = document.createElement('div');
-        row.className = 'slow-row';
-        row.innerHTML =
-          '<span><span class="rank r' + (idx+1) + '">' + (idx+1) + '</span>'
-          + '<span class="qtext">' + q.label + ' = ' + q.answer + '</span></span>'
-          + '<span class="qtime">' + (q.ms / 1000).toFixed(2) + ' 秒</span>';
-        slowestList.appendChild(row);
-      });
-    }
-
-    resultEl.classList.add('show');
-    startBtn.textContent = '開始挑戰';
-  }
-
-  // --- 模式切換 ---
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (started) return;
-      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentMode = btn.dataset.mode;
-      // 預覽空格
-      generateHeaders(currentMode);
-      computeAnswers(currentMode);
-      buildGrid(currentMode);
-    });
-  });
-
-  startBtn.addEventListener('click', () => {
-    if (timerInterval) clearInterval(timerInterval);
-    timerEl.textContent = '00:00.00';
-    runCountdownThenStart();
-  });
-
-  // 3 秒倒數: 顯示 3 → 2 → 1 → GO!, 結束後才真正開始
-  function runCountdownThenStart() {
-    // 若上一輪處於暫停狀態, 先徹底清掉暫停相關的 UI 與狀態
-    paused = false;
-    pauseOverlay.classList.remove('show');
-    pauseBtn.textContent = '暫停';
-    pauseBtn.classList.remove('paused');
-    // 預先建立題目, 讓使用者看到題目板已就位
-    generateHeaders(currentMode);
-    computeAnswers(currentMode);
-    buildGrid(currentMode);
-    resultEl.classList.remove('show');
-    // 暫時禁用按鈕避免重複點擊
-    startBtn.disabled = true;
-    document.querySelectorAll('.mode-btn').forEach(b => b.style.pointerEvents = 'none');
-
-    const overlay = document.getElementById('countdownOverlay');
-    const numEl = document.getElementById('countdownNum');
-    overlay.classList.add('show');
-
-    const sequence = ['3', '2', '1', 'GO!'];
-    let idx = 0;
-    function showStep() {
-      // 重設動畫: 移除→強制重排→重加 class
-      numEl.classList.remove('go');
-      numEl.style.animation = 'none';
-      void numEl.offsetWidth;
-      numEl.style.animation = '';
-      numEl.textContent = sequence[idx];
-      if (sequence[idx] === 'GO!') numEl.classList.add('go');
-      idx++;
-      if (idx < sequence.length) {
-        setTimeout(showStep, 800);
-      } else {
-        // 全部跑完
-        setTimeout(() => {
-          overlay.classList.remove('show');
-          startBtn.disabled = false;
-          document.querySelectorAll('.mode-btn').forEach(b => b.style.pointerEvents = '');
-          start(true);
-        }, 600);
-      }
-    }
-    showStep();
-  }
-
-  pauseBtn.addEventListener('click', togglePause);
-
-  // --- 重新選擇題目: 中止當前挑戰, 不存紀錄, 回到初始可選狀態 ---
-  function resetChallenge() {
-    if (!started) return;
-    // 停止計時器
-    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    // 重置狀態
-    started = false;
-    paused = false;
-    pausedTotal = 0;
-    filledCount = 0;
-    // UI 還原
-    timerEl.textContent = '00:00.00';
-    pauseOverlay.classList.remove('show');
-    pauseBtn.textContent = '暫停';
-    pauseBtn.classList.remove('paused');
-    pauseBtn.disabled = true;
-    resetBtn.disabled = true;
-    finishBtn.disabled = true;
-    startBtn.textContent = '開始挑戰';
-    resultEl.classList.remove('show');
-    // 重新建立預覽空格
-    generateHeaders(currentMode);
-    computeAnswers(currentMode);
-    buildGrid(currentMode);
-  }
-  resetBtn.addEventListener('click', resetChallenge);
-
-  // --- 結束挑戰: 停止計時, 把已完成的部分當作成果存下來 ---
-  function finishEarly() {
-    if (!started) return;
-    // 暫停中先解除暫停, 不然時間算不準
-    if (paused) {
-      paused = false;
-      pausedTotal += performance.now() - pauseStartTime;
-      pauseOverlay.classList.remove('show');
-      pauseBtn.textContent = '暫停';
-      pauseBtn.classList.remove('paused');
-    }
-    if (!confirm('確定要結束這次挑戰嗎?\n已完成 ' + filledCount + ' 題的成績會存入紀錄。')) {
-      return;
-    }
-    finish(true); // true = 提早結束
-  }
-  finishBtn.addEventListener('click', finishEarly);
-
-  // --- 歷史成績 / 導出 / 清除 ---
-  const STORAGE_KEY = 'math100_records_v1';
-  const modeNames = {
-    add: '加法 (0-9)',
-    sub: '減法 (10-19 減 0-9)',
-    mul: '乘法 (0-9)',
-    div: '除法 (10-99 除 1-9)',
-    mul2: '2 的乘法', mul3: '3 的乘法', mul4: '4 的乘法', mul5: '5 的乘法',
-    mul6: '6 的乘法', mul7: '7 的乘法', mul8: '8 的乘法', mul9: '9 的乘法'
-  };
-  const allModes = ['add','sub','mul','div','mul2','mul3','mul4','mul5','mul6','mul7','mul8','mul9'];
-
-  function loadRecords() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      const arr = JSON.parse(raw);
-      return Array.isArray(arr) ? arr : [];
-    } catch (e) { return []; }
-  }
-
-  function saveRecord(rec) {
-    const all = loadRecords();
-    all.push(rec);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-    } catch (e) {
-      console.warn('無法儲存紀錄:', e);
-    }
-  }
-
-  function formatDate(ts) {
-    const d = new Date(ts);
-    const pad = n => String(n).padStart(2, '0');
-    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate())
-      + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
-  }
-
-  function renderHistory() {
-    const records = loadRecords();
-
-    // 最佳紀錄 (排除暫停 + 提早結束)
-    const bestWrap = document.getElementById('bestRecords');
-    bestWrap.innerHTML = '';
-    const bestByMode = {};
-    records.forEach(r => {
-      if (r.paused || r.early) return; // 暫停或提早結束的不列入最佳
-      if (!bestByMode[r.mode] || r.timeMs < bestByMode[r.mode].timeMs) {
-        bestByMode[r.mode] = r;
-      }
-    });
-    allModes.forEach(m => {
-      const div = document.createElement('div');
-      div.className = 'best-record';
-      const best = bestByMode[m];
-      div.innerHTML = '<div class="mode-name">' + modeNames[m] + '</div>'
-        + '<div class="best-time">' + (best ? formatTime(best.timeMs) : '—') + '</div>';
-      bestWrap.appendChild(div);
-    });
-
-    // 歷史清單
-    const tableWrap = document.getElementById('historyTableWrap');
-    tableWrap.innerHTML = '';
-    if (records.length === 0) {
-      tableWrap.innerHTML = '<div class="history-empty">尚無紀錄。完成一次挑戰就會自動存下來。</div>';
-      return;
-    }
-    const sorted = records.slice().sort((a,b) => b.timestamp - a.timestamp);
-    const table = document.createElement('table');
-    table.className = 'history-table';
-    table.innerHTML = '<thead><tr><th>日期</th><th>模式</th><th>用時</th><th>完成度</th></tr></thead>';
-    const tbody = document.createElement('tbody');
-    sorted.forEach(r => {
-      const tr = document.createElement('tr');
-      const tags = (r.paused ? '<span class="paused-tag">含暫停</span>' : '')
-                 + (r.early ? '<span class="paused-tag" style="background:#fadbd8;color:#c0392b;">提早</span>' : '');
-      // 舊紀錄沒有 done/total, 直接標完成
-      const progress = (r.done !== undefined && r.total !== undefined)
-        ? (r.done + '/' + r.total)
-        : '完成';
-      tr.innerHTML = '<td>' + formatDate(r.timestamp) + '</td>'
-        + '<td>' + (modeNames[r.mode] || r.mode) + tags + '</td>'
-        + '<td class="time">' + formatTime(r.timeMs) + '</td>'
-        + '<td>' + progress + '</td>';
-      tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-    tableWrap.appendChild(table);
-  }
-
-  function exportTXT() {
-    const records = loadRecords();
-    if (records.length === 0) {
-      alert('尚無紀錄可以導出。');
-      return;
-    }
-    const sorted = records.slice().sort((a,b) => b.timestamp - a.timestamp);
-
-    // 算出各模式最佳紀錄 (不含暫停與提早結束)
-    const bestByMode = {};
-    records.forEach(r => {
-      if (r.paused || r.early) return;
-      if (!bestByMode[r.mode] || r.timeMs < bestByMode[r.mode].timeMs) {
-        bestByMode[r.mode] = r;
-      }
-    });
-
-    const lines = [];
-    lines.push('===== 數學一百格 - 歷史成績 =====');
-    lines.push('導出時間: ' + formatDate(Date.now()));
-    lines.push('總筆數: ' + records.length);
-    lines.push('');
-    lines.push('----- 各模式最佳紀錄 -----');
-    allModes.forEach(m => {
-      const best = bestByMode[m];
-      const name = (modeNames[m] || m).padEnd(20, ' ');
-      lines.push(name + '  ' + (best ? formatTime(best.timeMs) : '—'));
-    });
-    lines.push('');
-    lines.push('----- 所有紀錄 (由新到舊) -----');
-    lines.push('日期              模式                  用時         完成度      備註');
-    lines.push('--------------------------------------------------------------------');
-    sorted.forEach(r => {
-      const dateStr = formatDate(r.timestamp).padEnd(18, ' ');
-      const modeStr = (modeNames[r.mode] || r.mode);
-      const modePad = padEndCJK(modeStr, 22);
-      const timeStr = formatTime(r.timeMs).padEnd(13, ' ');
-      const progress = (r.done !== undefined && r.total !== undefined)
-        ? (r.done + '/' + r.total) : '完成';
-      const progPad = progress.padEnd(11, ' ');
-      const notes = [];
-      if (r.paused) notes.push('含暫停');
-      if (r.early) notes.push('提早');
-      lines.push(dateStr + modePad + timeStr + progPad + notes.join(' '));
-    });
-
-    const txt = lines.join('\n');
-    // 加上 BOM 讓 Windows 記事本正確判斷為 UTF-8
-    const blob = new Blob(['\uFEFF' + txt], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'math100_records_' + new Date().toISOString().slice(0,10) + '.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  // 中文字元寬度近似: 中文/全形計 2, 其他計 1, 然後 pad 到指定寬度
-  function padEndCJK(str, width) {
-    let w = 0;
-    for (const ch of str) {
-      w += /[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/.test(ch) ? 2 : 1;
-    }
-    const pad = Math.max(0, width - w);
-    return str + ' '.repeat(pad);
-  }
-
-  function clearAllRecords() {
-    if (!confirm('確定要清除所有歷史紀錄嗎?此動作無法復原。')) return;
-    localStorage.removeItem(STORAGE_KEY);
-    renderHistory();
-  }
-
-  // Modal 綁定
-  const historyModal = document.getElementById('historyModal');
-  document.getElementById('historyBtn').addEventListener('click', () => {
-    renderHistory();
-    historyModal.classList.add('show');
-  });
-  document.getElementById('modalCloseBtn').addEventListener('click', () => {
-    historyModal.classList.remove('show');
-  });
-  historyModal.addEventListener('click', (e) => {
-    if (e.target === historyModal) historyModal.classList.remove('show');
-  });
-  document.getElementById('exportBtn').addEventListener('click', exportTXT);
-  document.getElementById('clearBtn').addEventListener('click', clearAllRecords);
-
-  // 初始預覽
-  generateHeaders(currentMode);
-  computeAnswers(currentMode);
-  buildGrid(currentMode);
-
-  // --- PWA: 註冊 Service Worker ---
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(err => {
-        console.warn('Service Worker 註冊失敗:', err);
-      });
-    });
-  }
+document.getElementById('menuHistory').addEventListener('click',()=>{renderHistory();openSheet(historySheet)});
+document.getElementById('menuShare').addEventListener('click',()=>{closeSheet();setTimeout(shareBest,200)});
+document.getElementById('menuExport').addEventListener('click',()=>{closeSheet();setTimeout(exportTXT,200)});
+document.getElementById('menuCopy').addEventListener('click',()=>{closeSheet();setTimeout(copyBest,200)});
+document.getElementById('menuClear').addEventListener('click',()=>{closeSheet();setTimeout(clearAllRecords,200)});
+document.getElementById('resultShareBtn').addEventListener('click',shareResult);
+let toastTimer=null;function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
+selectMode(currentMode);
+if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})});
 </script>
-
 </body>
 </html>
